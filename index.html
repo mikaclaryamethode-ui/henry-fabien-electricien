@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Henry Fabien — Électricien | Lanne en Barétous</title>
+  <meta name="description" content="Électricien indépendant avec +20 ans d'expérience dans les Pyrénées-Atlantiques. Dépannage, installation, mise aux normes. Appelez le 06 25 17 06 65." />
+  <meta name="theme-color" content="#0f1014" />
+  <meta property="og:title" content="Henry Fabien — Électricien" />
+  <meta property="og:description" content="+20 ans d'expérience. Dépannage, installation, mise aux normes. Pyrénées-Atlantiques." />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="fr_FR" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --orange:  #F5A623;
+      --orange2: #e8941a;
+      --dark:    #0f1014;
+      --dark2:   #181b22;
+      --dark3:   #1f232e;
+      --border:  rgba(245,166,35,0.16);
+      --text:    #d8dce8;
+      --muted:   #6b7280;
+      --circuit: #4e6a84;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--dark);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 999; opacity: 0.6;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2rem;
+      background: rgba(15,16,20,0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 0.7rem; text-decoration: none; }
+    .nav-logo-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.15rem; letter-spacing: 0.1em; color: #fff;
+    }
+    .nav-tel {
+      font-size: 0.88rem; font-weight: 500; color: var(--text);
+      text-decoration: none; border: 1px solid var(--border);
+      padding: 0.5rem 1.1rem; border-radius: 4px;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+    .nav-tel:hover { background: var(--orange); color: #000; border-color: var(--orange); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 9rem 2rem 5rem;
+      position: relative; overflow: hidden;
+    }
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 75% 75% at 40% 50%, black 20%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 75% 75% at 40% 50%, black 20%, transparent 100%);
+    }
+    .hero-glow {
+      position: absolute; top: 15%; left: 30%;
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(245,166,35,0.1) 0%, transparent 65%);
+      pointer-events: none; transform: translateX(-50%);
+    }
+    .hero-inner { position: relative; max-width: 780px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--orange); font-weight: 500; margin-bottom: 1.2rem;
+    }
+    .hero-badge::before {
+      content: ''; display: block; width: 22px; height: 1px; background: var(--orange);
+    }
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.2rem, 9vw, 7.5rem);
+      line-height: 0.92; letter-spacing: 0.02em; color: #fff;
+      margin-bottom: 1.8rem;
+    }
+    h1 em { color: var(--orange); font-style: normal; }
+    .hero-desc {
+      font-size: 1rem; line-height: 1.75; color: var(--muted);
+      max-width: 460px; margin-bottom: 1.8rem;
+    }
+
+    /* Stat badge */
+    .stat-badge {
+      display: inline-flex; align-items: center; gap: 0.8rem;
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: 0.6rem 1.2rem; margin-bottom: 2.2rem;
+      background: rgba(245,166,35,0.05);
+    }
+    .stat-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem; line-height: 1; color: var(--orange);
+    }
+    .stat-label {
+      font-size: 0.78rem; line-height: 1.4; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.1em;
+    }
+
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    /* BUTTONS */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--orange); color: #000;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500; font-size: 0.95rem;
+      padding: 0.85rem 1.8rem; border-radius: 4px; text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .btn-primary:hover { background: var(--orange2); transform: translateY(-2px); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      border: 1px solid var(--border); color: var(--text);
+      font-size: 0.95rem; padding: 0.85rem 1.8rem;
+      border-radius: 4px; text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--orange); color: var(--orange); }
+
+    /* LAYOUT */
+    section { padding: 5rem 2rem; position: relative; }
+    .container { max-width: 1000px; margin: 0 auto; }
+    .divider {
+      width: 100%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+    .section-label {
+      font-size: 0.68rem; letter-spacing: 0.28em;
+      text-transform: uppercase; color: var(--orange);
+      font-weight: 500; margin-bottom: 0.6rem;
+    }
+    h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.8rem, 4.5vw, 3.2rem);
+      color: #fff; letter-spacing: 0.03em; margin-bottom: 1rem;
+    }
+
+    /* SERVICES */
+    .services-intro {
+      color: var(--muted); font-size: 1rem; line-height: 1.7;
+      max-width: 500px; margin-bottom: 2.5rem;
+    }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1px; background: var(--border);
+      border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+    }
+    .service-card {
+      background: var(--dark2); padding: 2rem 1.8rem;
+      transition: background 0.2s;
+    }
+    .service-card:hover { background: var(--dark3); }
+    .service-icon { font-size: 1.6rem; margin-bottom: 0.9rem; }
+    .service-card h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem; letter-spacing: 0.05em; color: #fff; margin-bottom: 0.5rem;
+    }
+    .service-card p { font-size: 0.87rem; color: var(--muted); line-height: 1.6; }
+
+    /* ZONE */
+    .zone-section { background: var(--dark2); }
+    .zone-content {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4rem; align-items: center;
+    }
+    .zone-text p { color: var(--muted); line-height: 1.7; margin-bottom: 1.5rem; }
+    .zone-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .zone-tag {
+      font-size: 0.8rem; padding: 0.35rem 0.9rem;
+      border: 1px solid var(--border); border-radius: 100px; color: var(--text);
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .zone-tag:hover { border-color: var(--orange); color: var(--orange); }
+    .zone-visual { display: flex; justify-content: center; }
+    .zone-orb {
+      width: 240px; height: 240px; border-radius: 50%;
+      border: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 0.5rem;
+      background: radial-gradient(circle, rgba(245,166,35,0.07), transparent 70%);
+      font-size: 2.2rem;
+    }
+    .zone-orb span {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.9rem; letter-spacing: 0.15em; color: var(--orange);
+    }
+
+    /* CTA BAND */
+    .cta-band { background: var(--orange); padding: 3.5rem 2rem; text-align: center; }
+    .cta-band h2 { color: #000; margin-bottom: 0.8rem; }
+    .cta-band p { color: rgba(0,0,0,0.6); margin-bottom: 2rem; font-size: 1.05rem; }
+    .btn-dark {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      background: #000; color: var(--orange);
+      font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 1rem;
+      padding: 1rem 2.5rem; border-radius: 4px; text-decoration: none;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+    .btn-dark:hover { transform: translateY(-2px); opacity: 0.9; }
+
+    /* CONTACT */
+    .contact-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1px; background: var(--border);
+      border: 1px solid var(--border); border-radius: 8px;
+      overflow: hidden; margin-top: 2rem;
+    }
+    .contact-item {
+      background: var(--dark2); padding: 1.8rem 2rem;
+      display: flex; flex-direction: column; gap: 0.3rem;
+    }
+    .contact-label {
+      font-size: 0.68rem; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .contact-value {
+      font-size: 1.1rem; font-weight: 500; color: #fff;
+      text-decoration: none; transition: color 0.2s;
+    }
+    a.contact-value:hover { color: var(--orange); }
+    .contact-sub { color: var(--muted); font-size: 0.88rem; }
+
+    /* FOOTER */
+    footer {
+      background: var(--dark);
+      border-top: 1px solid var(--border);
+      padding: 2rem; text-align: center;
+    }
+    footer p { font-size: 0.77rem; color: var(--muted); line-height: 1.9; }
+    .footer-dim { color: #333; }
+
+    /* SCROLL REVEAL */
+    .reveal {
+      opacity: 0; transform: translateY(22px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-d1 { transition-delay: 0.08s; }
+    .reveal-d2 { transition-delay: 0.16s; }
+    .reveal-d3 { transition-delay: 0.24s; }
+    .reveal-d4 { transition-delay: 0.32s; }
+
+    /* HERO ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(18px); }
+      to   { opacity:1; transform: none; }
+    }
+    .anim-1 { animation: fadeUp 0.55s 0.05s ease both; }
+    .anim-2 { animation: fadeUp 0.55s 0.18s ease both; }
+    .anim-3 { animation: fadeUp 0.55s 0.28s ease both; }
+    .anim-4 { animation: fadeUp 0.55s 0.36s ease both; }
+    .anim-5 { animation: fadeUp 0.55s 0.44s ease both; }
+    .anim-6 { animation: fadeUp 0.55s 0.52s ease both; }
+
+    /* RESPONSIVE */
+    @media (max-width: 700px) {
+      nav { padding: 0.9rem 1.2rem; }
+      .hero { padding: 7rem 1.2rem 3.5rem; }
+      section { padding: 3.5rem 1.2rem; }
+      .zone-content { grid-template-columns: 1fr; gap: 2rem; }
+      .zone-visual { display: none; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .nav-logo-text { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo" aria-label="Henry Fabien Électricien — accueil">
+      <svg viewBox="0 0 216 54" width="108" height="27" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="0" y="24" width="9" height="6" rx="1" fill="none" stroke="#4e6a84" stroke-width="1.5"/>
+        <line x1="9" y1="27" x2="16" y2="27" stroke="#4e6a84" stroke-width="2"/>
+        <polygon points="16,22 16,32 24,27" fill="#4e6a84"/>
+        <line x1="24" y1="22" x2="24" y2="32" stroke="#4e6a84" stroke-width="1.5"/>
+        <line x1="24" y1="27" x2="30" y2="27" stroke="#4e6a84" stroke-width="2"/>
+        <circle cx="46" cy="27" r="15" fill="none" stroke="#4e6a84" stroke-width="1.5"/>
+        <path d="M46 19 a7 7 0 0 1 4 12.5 V34 H42 V31.5 A7 7 0 0 1 46 19z" fill="#F5A623" opacity="0.9"/>
+        <rect x="42" y="34" width="8" height="2" rx="1" fill="#F5A623" opacity="0.7"/>
+        <line x1="61" y1="27" x2="66" y2="27" stroke="#4e6a84" stroke-width="2"/>
+        <rect x="66" y="23" width="13" height="8" rx="2" fill="#4e6a84" opacity="0.6"/>
+        <line x1="72" y1="23" x2="72" y2="17" stroke="#4e6a84" stroke-width="1.5"/>
+        <circle cx="72" cy="15.5" r="2.5" fill="#F5A623"/>
+        <line x1="79" y1="27" x2="84" y2="27" stroke="#4e6a84" stroke-width="2"/>
+        <circle cx="99" cy="27" r="15" fill="none" stroke="#4e6a84" stroke-width="1.5"/>
+        <rect x="91" y="22" width="16" height="12" rx="3" fill="#F5A623" opacity="0.85"/>
+        <line x1="96" y1="19" x2="96" y2="22" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="102" y1="19" x2="102" y2="22" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="99" y1="34" x2="99" y2="38" stroke="#F5A623" stroke-width="2" stroke-linecap="round"/>
+        <line x1="114" y1="27" x2="119" y2="27" stroke="#4e6a84" stroke-width="2"/>
+        <rect x="119" y="23" width="13" height="8" rx="2" fill="#4e6a84" opacity="0.6"/>
+        <line x1="125" y1="31" x2="125" y2="37" stroke="#4e6a84" stroke-width="1.5"/>
+        <circle cx="125" cy="38.5" r="2.5" fill="#F5A623"/>
+        <line x1="132" y1="27" x2="137" y2="27" stroke="#4e6a84" stroke-width="2"/>
+        <circle cx="152" cy="27" r="15" fill="none" stroke="#4e6a84" stroke-width="1.5"/>
+        <polygon points="155,18 148,27 153,27 149,36 157,25 152,25" fill="#F5A623"/>
+        <line x1="167" y1="27" x2="172" y2="27" stroke="#4e6a84" stroke-width="2"/>
+        <polygon points="172,22 172,32 180,27" fill="#4e6a84"/>
+        <line x1="180" y1="22" x2="180" y2="32" stroke="#4e6a84" stroke-width="1.5"/>
+        <line x1="180" y1="27" x2="186" y2="27" stroke="#4e6a84" stroke-width="2"/>
+        <line x1="186" y1="20" x2="186" y2="34" stroke="#4e6a84" stroke-width="1.5"/>
+        <line x1="189" y1="20" x2="189" y2="34" stroke="#4e6a84" stroke-width="1.5"/>
+        <line x1="189" y1="27" x2="196" y2="27" stroke="#4e6a84" stroke-width="2"/>
+        <rect x="196" y="22" width="10" height="10" rx="1" fill="none" stroke="#4e6a84" stroke-width="1.5"/>
+      </svg>
+      <span class="nav-logo-text">Henry Fabien</span>
+    </a>
+    <a href="tel:0625170665" class="nav-tel">📞 06 25 17 06 65</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" aria-label="Présentation">
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="hero-inner">
+
+      <!-- Logo hero grand format -->
+      <svg class="anim-1" viewBox="0 0 216 54" width="216" height="54" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin-bottom:1.6rem" aria-label="Logo circuit Henry Fabien">
+        <rect x="0" y="24" width="9" height="6" rx="1" fill="none" stroke="#4e6a84" stroke-width="1.5"/>
+        <line x1="9" y1="27" x2="16" y2="27" stroke="#4e6a84" stroke-width="2"/>
+        <polygon points="16,22 16,32 24,27" fill="#4e6a84"/>
+        <line x1="24" y1="22" x2="24" y2="32" stroke="#4e6a84" stroke-width="1.5"/>
+        <line x1="24" y1="27" x2="30" y2="27" stroke="#4e6a84" stroke-width="2"/>
+        <circle cx="46" cy="27" r="15" fill="rgba(245,166,35,0.1)" stroke="#F5A623" stroke-width="1.8"/>
+        <path d="M46 19 a7 7 0 0 1 4 12.5 V34 H42 V31.5 A7 7 0 0 1 46 19z" fill="#F5A623"/>
+        <rect x="42" y="34" width="8" height="2" rx="1" fill="#F5A623" opacity="0.8"/>
+        <rect x="43" y="36.5" width="6" height="1.5" rx="0.75" fill="#F5A623" opacity="0.55"/>
+        <line x1="61" y1="27" x2="66" y2="27" stroke="#4e6a84" stroke-width="2"/>
+        <rect x="66" y="23" width="13" height="8" rx="2" fill="#4e6a84" opacity="0.7"/>
+        <line x1="72" y1="23" x2="72" y2="17" stroke="#4e6a84" stroke-width="1.5"/>
+        <circle cx="72" cy="15.5" r="2.5" fill="#F5A623"/>
+        <line x1="79" y1="27" x2="84" y2="27" stroke="#4e6a84" stroke-width="2"/>
+        <circle cx="99" cy="27" r="15" fill="rgba(245,166,35,0.1)" stroke="#F5A623" stroke-width="1.8"/>
+        <rect x="91" y="22" width="16" height="12" rx="3" fill="#F5A623" opacity="0.9"/>
+        <line x1="96" y1="19" x2="96" y2="22" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="102" y1="19" x2="102" y2="22" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="99" y1="34" x2="99" y2="38" stroke="#F5A623" stroke-width="2" stroke-linecap="round"/>
+        <line x1="114" y1="27" x2="119" y2="27" stroke="#4e6a84" stroke-width="2"/>
+        <rect x="119" y="23" width="13" height="8" rx="2" fill="#4e6a84" opacity="0.7"/>
+        <line x1="125" y1="31" x2="125" y2="37" stroke="#4e6a84" stroke-width="1.5"/>
+        <circle cx="125" cy="38.5" r="2.5" fill="#F5A623"/>
+        <line x1="132" y1="27" x2="137" y2="27" stroke="#4e6a84" stroke-width="2"/>
+        <circle cx="152" cy="27" r="15" fill="rgba(245,166,35,0.1)" stroke="#F5A623" stroke-width="1.8"/>
+        <polygon points="155,18 148,27 153,27 149,36 157,25 152,25" fill="#F5A623"/>
+        <line x1="167" y1="27" x2="172" y2="27" stroke="#4e6a84" stroke-width="2"/>
+        <polygon points="172,22 172,32 180,27" fill="#4e6a84"/>
+        <line x1="180" y1="22" x2="180" y2="32" stroke="#4e6a84" stroke-width="1.5"/>
+        <line x1="180" y1="27" x2="186" y2="27" stroke="#4e6a84" stroke-width="2"/>
+        <line x1="186" y1="20" x2="186" y2="34" stroke="#4e6a84" stroke-width="1.5"/>
+        <line x1="189" y1="20" x2="189" y2="34" stroke="#4e6a84" stroke-width="1.5"/>
+        <line x1="189" y1="27" x2="196" y2="27" stroke="#4e6a84" stroke-width="2"/>
+        <rect x="196" y="22" width="10" height="10" rx="1" fill="none" stroke="#4e6a84" stroke-width="1.5"/>
+      </svg>
+
+      <div class="hero-badge anim-2">Électricien Indépendant · Pyrénées-Atlantiques</div>
+      <h1 class="anim-3">L'électricité,<br><em>sans complication.</em></h1>
+      <div class="stat-badge anim-4" aria-label="Plus de 20 ans d'expérience">
+        <span class="stat-number">20+</span>
+        <span class="stat-label">ans<br>d'expérience</span>
+      </div>
+      <p class="hero-desc anim-5">
+        Dépannage, installation, mise aux normes.
+        J'interviens dans les Pyrénées-Atlantiques — rapide, sérieux, au juste prix.
+      </p>
+      <div class="hero-actions anim-6">
+        <a href="tel:0625170665" class="btn-primary">⚡ Appeler maintenant</a>
+        <a href="#services" class="btn-secondary">Voir les prestations →</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SERVICES -->
+  <section id="services" aria-labelledby="services-title">
+    <div class="container">
+      <div class="section-label reveal">Ce que je fais</div>
+      <h2 id="services-title" class="reveal reveal-d1">Prestations</h2>
+      <p class="services-intro reveal reveal-d2">
+        Dépannage d'urgence ou rénovation complète — j'interviens sur tous types de travaux électriques avec la rigueur de 20 ans de métier.
+      </p>
+      <div class="services-grid">
+        <div class="service-card reveal reveal-d1">
+          <div class="service-icon">🔧</div>
+          <h3>Dépannage</h3>
+          <p>Panne, disjoncteur qui saute, prise défectueuse. Intervention rapide pour rétablir le courant.</p>
+        </div>
+        <div class="service-card reveal reveal-d2">
+          <div class="service-icon">⚙️</div>
+          <h3>Installation</h3>
+          <p>Tableaux électriques, prises, interrupteurs, éclairage. Neuf ou en remplacement.</p>
+        </div>
+        <div class="service-card reveal reveal-d3">
+          <div class="service-icon">📋</div>
+          <h3>Mise aux normes</h3>
+          <p>Conformité NF C 15-100. Certificat Consuel, diagnostic pour vente ou location.</p>
+        </div>
+        <div class="service-card reveal reveal-d4">
+          <div class="service-icon">🏠</div>
+          <h3>Rénovation</h3>
+          <p>Réfection complète de l'installation électrique d'un appartement, d'une maison ou d'un local.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ZONE -->
+  <section class="zone-section" id="zone" aria-labelledby="zone-title">
+    <div class="container">
+      <div class="zone-content">
+        <div class="zone-text">
+          <div class="section-label reveal">Où j'interviens</div>
+          <h2 id="zone-title" class="reveal reveal-d1">Zone d'intervention</h2>
+          <p class="reveal reveal-d2">Basé à Lanne en Barétous (64570), j'interviens dans tout le piémont pyrénéen et les communes alentour.</p>
+          <div class="zone-tags reveal reveal-d3">
+            <span class="zone-tag">Lanne en Barétous</span>
+            <span class="zone-tag">Oloron-Sainte-Marie</span>
+            <span class="zone-tag">Mauléon-Licharre</span>
+            <span class="zone-tag">Tardets-Sorholus</span>
+            <span class="zone-tag">Aramits</span>
+            <span class="zone-tag">Pyrénées-Atlantiques</span>
+          </div>
+        </div>
+        <div class="zone-visual reveal">
+          <div class="zone-orb" aria-hidden="true">
+            📍
+            <span>64 · Pyrénées-Atlantiques</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BAND -->
+  <div class="cta-band">
+    <h2>Un problème électrique ?</h2>
+    <p>Contactez-moi directement. Je réponds vite.</p>
+    <a href="tel:0625170665" class="btn-dark">⚡ 06 25 17 06 65</a>
+  </div>
+
+  <!-- CONTACT -->
+  <section id="contact" aria-labelledby="contact-title">
+    <div class="container">
+      <div class="section-label reveal">Me joindre</div>
+      <h2 id="contact-title" class="reveal reveal-d1">Contact</h2>
+      <div class="contact-grid">
+        <div class="contact-item reveal reveal-d1">
+          <span class="contact-label">Téléphone</span>
+          <a href="tel:0625170665" class="contact-value">06 25 17 06 65</a>
+        </div>
+        <div class="contact-item reveal reveal-d2">
+          <span class="contact-label">Email</span>
+          <a href="mailto:henryfabien95230@outlook.fr" class="contact-value">henryfabien95230@outlook.fr</a>
+        </div>
+        <div class="contact-item reveal reveal-d3">
+          <span class="contact-label">Adresse</span>
+          <span class="contact-value">66 Rue Matachot</span>
+          <span class="contact-sub">64570 Lanne en Barétous</span>
+        </div>
+        <div class="contact-item reveal reveal-d4">
+          <span class="contact-label">Activité</span>
+          <span class="contact-value">Électricien indépendant</span>
+          <span class="contact-sub">Entreprise individuelle (EI)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>
+      Henry Fabien — Électricien · 66 Rue Matachot, 64570 Lanne en Barétous<br>
+      TVA non applicable, article 293 B du CGI<br>
+      <span class="footer-dim">© 2026 Henry Fabien. Tous droits réservés.</span>
+    </p>
+  </footer>
+
+  <script>
+    const obs = new IntersectionObserver(
+      entries => entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+      }),
+      { threshold: 0.12 }
+    );
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  </script>
+
+</body>
+</html>
