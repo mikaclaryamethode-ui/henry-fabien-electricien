@@ -13,6 +13,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
   <style>
     :root {
       --orange:  #F5A623;
@@ -24,6 +26,7 @@
       --text:    #d8dce8;
       --muted:   #6b7280;
       --circuit: #4e6a84;
+      --blue:    #00f3ff;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -80,14 +83,21 @@
       background-size: 60px 60px;
       mask-image: radial-gradient(ellipse 75% 75% at 40% 50%, black 20%, transparent 100%);
       -webkit-mask-image: radial-gradient(ellipse 75% 75% at 40% 50%, black 20%, transparent 100%);
+      z-index: 0; opacity: 0.7;
     }
+    /* CORRECTION : glow géré en JS via style.left/top en px, plus en CSS custom props */
     .hero-glow {
-      position: absolute; top: 15%; left: 30%;
-      width: 700px; height: 700px;
-      background: radial-gradient(circle, rgba(245,166,35,0.1) 0%, transparent 65%);
-      pointer-events: none; transform: translateX(-50%);
+      position: absolute;
+      width: 800px; height: 800px;
+      background: radial-gradient(circle, rgba(245,166,35,0.09) 0%, transparent 65%);
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: left 0.4s ease-out, top 0.4s ease-out;
+      z-index: 1;
+      top: 30%; left: 35%;
     }
-    .hero-inner { position: relative; max-width: 780px; }
+    .hero-inner { position: relative; max-width: 780px; z-index: 2; }
+
     .hero-badge {
       display: inline-flex; align-items: center; gap: 0.5rem;
       font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
@@ -96,19 +106,21 @@
     .hero-badge::before {
       content: ''; display: block; width: 22px; height: 1px; background: var(--orange);
     }
+
     h1 {
       font-family: 'Bebas Neue', sans-serif;
       font-size: clamp(3.2rem, 9vw, 7.5rem);
       line-height: 0.92; letter-spacing: 0.02em; color: #fff;
       margin-bottom: 1.8rem;
     }
+    /* CORRECTION : em reste orange — cohérence identité carte de visite */
     h1 em { color: var(--orange); font-style: normal; }
+
     .hero-desc {
       font-size: 1rem; line-height: 1.75; color: var(--muted);
       max-width: 460px; margin-bottom: 1.8rem;
     }
 
-    /* Stat badge */
     .stat-badge {
       display: inline-flex; align-items: center; gap: 0.8rem;
       border: 1px solid var(--border); border-radius: 6px;
@@ -130,8 +142,7 @@
     .btn-primary {
       display: inline-flex; align-items: center; gap: 0.5rem;
       background: var(--orange); color: #000;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 500; font-size: 0.95rem;
+      font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 0.95rem;
       padding: 0.85rem 1.8rem; border-radius: 4px; text-decoration: none;
       transition: background 0.2s, transform 0.2s;
     }
@@ -170,7 +181,7 @@
     }
     .services-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap: 1px; background: var(--border);
       border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
     }
@@ -200,18 +211,50 @@
       transition: border-color 0.2s, color 0.2s;
     }
     .zone-tag:hover { border-color: var(--orange); color: var(--orange); }
-    .zone-visual { display: flex; justify-content: center; }
-    .zone-orb {
-      width: 240px; height: 240px; border-radius: 50%;
-      border: 1px solid var(--border);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 0.5rem;
-      background: radial-gradient(circle, rgba(245,166,35,0.07), transparent 70%);
-      font-size: 2.2rem;
+
+    /* CARTE 3D */
+    .zone-visual {
+      display: flex; justify-content: center; align-items: center; position: relative;
     }
-    .zone-orb span {
+    #holo-map-container {
+      width: 100%; max-width: 420px;
+      aspect-ratio: 1 / 1;
+      position: relative;
+    }
+    .holo-base {
+      position: absolute; bottom: 8%; left: 50%;
+      transform: translateX(-50%);
+      width: 55%; height: 16px; border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(0,243,255,0.35) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+    #holo-canvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      z-index: 1;
+    }
+    /* CORRECTION : labels positionnés en absolute dans le container */
+    #holo-labels {
+      position: absolute; inset: 0;
+      pointer-events: none; z-index: 2;
+    }
+    .city-label {
+      position: absolute;
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 0.9rem; letter-spacing: 0.15em; color: var(--orange);
+      font-size: 0.8rem; letter-spacing: 0.1em;
+      color: var(--blue);
+      text-shadow: 0 0 8px rgba(0,243,255,0.5);
+      transform: translate(-50%, -130%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      white-space: nowrap;
+    }
+    .city-label.active { opacity: 1; }
+    .city-label.center-city {
+      color: var(--orange);
+      text-shadow: 0 0 10px rgba(245,166,35,0.7);
+      opacity: 1;
+      font-size: 0.9rem;
     }
 
     /* CTA BAND */
@@ -251,8 +294,7 @@
 
     /* FOOTER */
     footer {
-      background: var(--dark);
-      border-top: 1px solid var(--border);
+      background: var(--dark); border-top: 1px solid var(--border);
       padding: 2rem; text-align: center;
     }
     footer p { font-size: 0.77rem; color: var(--muted); line-height: 1.9; }
@@ -286,8 +328,10 @@
       nav { padding: 0.9rem 1.2rem; }
       .hero { padding: 7rem 1.2rem 3.5rem; }
       section { padding: 3.5rem 1.2rem; }
+      .services-grid { grid-template-columns: 1fr; }
       .zone-content { grid-template-columns: 1fr; gap: 2rem; }
-      .zone-visual { display: none; }
+      .zone-visual { margin-top: 2rem; }
+      #holo-map-container { max-width: 300px; }
       .contact-grid { grid-template-columns: 1fr; }
       .nav-logo-text { display: none; }
     }
@@ -339,12 +383,10 @@
   </nav>
 
   <!-- HERO -->
-  <section class="hero" aria-label="Présentation">
+  <section class="hero" id="hero-section" aria-label="Présentation">
     <div class="hero-grid" aria-hidden="true"></div>
-    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="hero-glow" id="hero-glow" aria-hidden="true"></div>
     <div class="hero-inner">
-
-      <!-- Logo hero grand format -->
       <svg class="anim-1" viewBox="0 0 216 54" width="216" height="54" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin-bottom:1.6rem" aria-label="Logo circuit Henry Fabien">
         <rect x="0" y="24" width="9" height="6" rx="1" fill="none" stroke="#4e6a84" stroke-width="1.5"/>
         <line x1="9" y1="27" x2="16" y2="27" stroke="#4e6a84" stroke-width="2"/>
@@ -447,16 +489,17 @@
           <div class="zone-tags reveal reveal-d3">
             <span class="zone-tag">Lanne en Barétous</span>
             <span class="zone-tag">Oloron-Sainte-Marie</span>
+            <span class="zone-tag">Pau</span>
+            <span class="zone-tag">Orthez</span>
             <span class="zone-tag">Mauléon-Licharre</span>
-            <span class="zone-tag">Tardets-Sorholus</span>
-            <span class="zone-tag">Aramits</span>
-            <span class="zone-tag">Pyrénées-Atlantiques</span>
+            <span class="zone-tag">Navarrenx</span>
           </div>
         </div>
-        <div class="zone-visual reveal">
-          <div class="zone-orb" aria-hidden="true">
-            📍
-            <span>64 · Pyrénées-Atlantiques</span>
+        <div class="zone-visual reveal reveal-d2">
+          <div id="holo-map-container" aria-label="Carte animée de la zone d'intervention">
+            <div class="holo-base" aria-hidden="true"></div>
+            <div id="holo-canvas"></div>
+            <div id="holo-labels"></div>
           </div>
         </div>
       </div>
@@ -508,6 +551,7 @@
   </footer>
 
   <script>
+    // ─── SCROLL REVEAL ───
     const obs = new IntersectionObserver(
       entries => entries.forEach(e => {
         if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
@@ -515,6 +559,186 @@
       { threshold: 0.12 }
     );
     document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+    // ─── GLOW SOURIS ───
+    // CORRECTION : on passe des px directement sur left/top, pas via CSS custom props
+    const heroSection = document.getElementById('hero-section');
+    const heroGlow    = document.getElementById('hero-glow');
+    if (heroSection && heroGlow) {
+      heroSection.addEventListener('mousemove', (e) => {
+        const rect = heroSection.getBoundingClientRect();
+        heroGlow.style.left = (e.clientX - rect.left) + 'px';
+        heroGlow.style.top  = (e.clientY - rect.top)  + 'px';
+      });
+    }
+
+    // ─── CARTE 3D THREE.JS ───
+    function initHoloMap() {
+      const wrapper       = document.getElementById('holo-map-container');
+      const canvasWrapper = document.getElementById('holo-canvas');
+      const labelWrapper  = document.getElementById('holo-labels');
+      if (!wrapper || !canvasWrapper || typeof THREE === 'undefined') return;
+
+      // CORRECTION : on lit les dimensions après que le DOM est visible
+      const W = wrapper.clientWidth  || 380;
+      const H = wrapper.clientHeight || 380;
+
+      const scene    = new THREE.Scene();
+      const camera   = new THREE.PerspectiveCamera(45, W / H, 0.1, 1000);
+      camera.position.set(0, 10, 14);
+      camera.lookAt(0, 0, 0);
+
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer.setSize(W, H);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.domElement.style.display = 'block'; // évite pixel fantôme
+      canvasWrapper.appendChild(renderer.domElement);
+
+      const mapGroup = new THREE.Group();
+      scene.add(mapGroup);
+
+      // GridHelper r128 : material est un tableau [centerMat, gridMat]
+      const grid = new THREE.GridHelper(16, 16, 0x00f3ff, 0x4e6a84);
+      [].concat(grid.material).forEach(m => { m.transparent = true; m.opacity = 0.12; });
+      mapGroup.add(grid);
+
+      // Cercles concentriques manuels pour l'effet radar
+      for (let r = 2; r <= 8; r += 2) {
+        const pts = [];
+        for (let i = 0; i <= 64; i++) {
+          const a = (i / 64) * Math.PI * 2;
+          pts.push(new THREE.Vector3(Math.cos(a) * r, 0, Math.sin(a) * r));
+        }
+        const geo = new THREE.BufferGeometry().setFromPoints(pts);
+        const mat = new THREE.LineBasicMaterial({ color: 0x00f3ff, transparent: true, opacity: 0.08 });
+        mapGroup.add(new THREE.Line(geo, mat));
+      }
+
+      const cities = [
+        { name: 'Lanne-en-Barétous', pos: new THREE.Vector3(-3, 0, 3),    isCenter: true },
+        { name: 'Oloron',            pos: new THREE.Vector3(-0.5, 0, 1.5), delay: 0.6 },
+        { name: 'Pau',               pos: new THREE.Vector3(4, 0, -2),     delay: 1.4 },
+        { name: 'Orthez',            pos: new THREE.Vector3(-1, 0, -4.5),  delay: 2.2 },
+        { name: 'Navarrenx',         pos: new THREE.Vector3(-2.5, 0, -1),  delay: 3.0 },
+        { name: 'Mauléon',           pos: new THREE.Vector3(-5, 0, 1.5),   delay: 3.8 }
+      ];
+
+      const cityObjects = [];
+      const arcs        = [];
+      const centerPos   = cities[0].pos;
+
+      cities.forEach(city => {
+        const geo  = new THREE.SphereGeometry(city.isCenter ? 0.28 : 0.14, 16, 16);
+        const mat  = new THREE.MeshBasicMaterial({
+          color: city.isCenter ? 0xF5A623 : 0x4e6a84,
+          transparent: !city.isCenter,
+          opacity: city.isCenter ? 1 : 0.5
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.copy(city.pos);
+        mapGroup.add(mesh);
+
+        // Halo pour la ville centre
+        if (city.isCenter) {
+          const haloGeo = new THREE.SphereGeometry(0.48, 16, 16);
+          const haloMat = new THREE.MeshBasicMaterial({ color: 0xF5A623, transparent: true, opacity: 0.25 });
+          mesh.add(new THREE.Mesh(haloGeo, haloMat));
+        }
+
+        // Label DOM
+        const label = document.createElement('div');
+        label.className = 'city-label' + (city.isCenter ? ' center-city' : '');
+        label.textContent = city.name;
+        labelWrapper.appendChild(label);
+
+        cityObjects.push({ data: city, mesh, label });
+
+        // Arc vers les villes secondaires
+        if (!city.isCenter) {
+          const mid = new THREE.Vector3(
+            (centerPos.x + city.pos.x) / 2,
+            centerPos.distanceTo(city.pos) * 0.38,
+            (centerPos.z + city.pos.z) / 2
+          );
+          const curve  = new THREE.QuadraticBezierCurve3(centerPos, mid, city.pos);
+          const points = curve.getPoints(50);
+          const arcGeo = new THREE.BufferGeometry().setFromPoints(points);
+          arcGeo.setDrawRange(0, 0);
+          const arcMat = new THREE.LineBasicMaterial({
+            color: 0xF5A623, transparent: true, opacity: 0.75,
+            blending: THREE.AdditiveBlending
+          });
+          const line = new THREE.Line(arcGeo, arcMat);
+          mapGroup.add(line);
+          arcs.push({ line, arcGeo, targetCity: cityObjects[cityObjects.length - 1], delay: city.delay, progress: 0 });
+        }
+      });
+
+      const clock        = new THREE.Clock();
+      const loopDuration = 6.5;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const time      = clock.getElapsedTime();
+        const cycleTime = time % loopDuration;
+        // Recalculé à chaque frame pour rester correct après resize
+        const halfW = wrapper.clientWidth  / 2;
+        const halfH = wrapper.clientHeight / 2;
+
+        // Rotation lente
+        mapGroup.rotation.y = time * 0.14;
+
+        // Pulsation ville centre
+        const pulse = 1 + Math.sin(time * 5) * 0.18;
+        cityObjects[0].mesh.scale.setScalar(pulse);
+
+        // Progression des arcs
+        arcs.forEach(arc => {
+          if (cycleTime > arc.delay && cycleTime < loopDuration - 0.4) {
+            arc.progress = Math.min((cycleTime - arc.delay) * 2.2, 1.0);
+          } else {
+            arc.progress = 0;
+            arc.targetCity.mesh.material.color.setHex(0x4e6a84);
+            arc.targetCity.mesh.material.opacity = 0.5;
+            arc.targetCity.label.classList.remove('active');
+          }
+          arc.arcGeo.setDrawRange(0, Math.round(arc.progress * 50));
+          if (arc.progress >= 1.0) {
+            arc.targetCity.mesh.material.color.setHex(0x00f3ff);
+            arc.targetCity.mesh.material.opacity = 1.0;
+            arc.targetCity.label.classList.add('active');
+          }
+        });
+
+        // Projection labels 2D
+        cityObjects.forEach(obj => {
+          const worldPos = new THREE.Vector3();
+          obj.mesh.getWorldPosition(worldPos);
+          worldPos.project(camera);
+          obj.label.style.left = (worldPos.x  *  halfW + halfW) + 'px';
+          obj.label.style.top  = (-worldPos.y * halfH + halfH) + 'px';
+        });
+
+        renderer.render(scene, camera);
+      }
+
+      // CORRECTION : on démarre l'animation seulement quand la section est visible
+      const mapObs = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) { animate(); mapObs.disconnect(); }
+      }, { threshold: 0.1 });
+      mapObs.observe(wrapper);
+
+      // Resize
+      window.addEventListener('resize', () => {
+        const nW = wrapper.clientWidth;
+        const nH = wrapper.clientHeight;
+        renderer.setSize(nW, nH);
+        camera.aspect = nW / nH;
+        camera.updateProjectionMatrix();
+      });
+    }
+
+    window.addEventListener('load', initHoloMap);
   </script>
 
 </body>
