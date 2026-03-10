@@ -1,0 +1,1752 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Henry Fabien — Électricien | Lanne en Barétous</title>
+  <meta name="description"
+    content="Électricien indépendant avec +25 ans d'expérience dans les Pyrénées-Atlantiques. Dépannage, installation, mise aux normes. Appelez le 06 25 17 06 65." />
+  <meta name="theme-color" content="#0f1014" />
+  <meta property="og:title" content="Henry Fabien — Électricien" />
+  <meta property="og:description"
+    content="+25 ans d'expérience. Dépannage, installation, mise aux normes. Pyrénées-Atlantiques." />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="fr_FR" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js" defer></script>
+
+  <style>
+    :root {
+      --orange: #F5A623;
+      --orange2: #e8941a;
+      --dark: #0f1014;
+      --dark2: #181b22;
+      --dark3: #1f232e;
+      --border: rgba(245, 166, 35, 0.16);
+      --text: #d8dce8;
+      --muted: #6b7280;
+      --circuit: #4e6a84;
+      --blue: #00f3ff;
+      --glass: rgba(255, 255, 255, 0.03);
+      --glass-hover: rgba(245, 166, 35, 0.08);
+      --glow: drop-shadow(0 0 12px rgba(245, 166, 35, 0.4));
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--dark);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.6;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      background: rgba(15, 16, 20, 0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      text-decoration: none;
+    }
+
+    .nav-logo-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.15rem;
+      letter-spacing: 0.1em;
+      color: #fff;
+    }
+
+    .nav-tel {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      padding: 0.5rem 1.1rem;
+      border-radius: 4px;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+      animation: btnPulse 2s infinite;
+    }
+
+    .nav-tel:hover {
+      background: var(--orange);
+      color: #000;
+      border-color: var(--orange);
+    }
+
+    .floating-urgency {
+      position: absolute;
+      top: 15%;
+      right: 5%;
+      background: rgba(245, 166, 35, 0.1);
+      border: 1px solid rgba(245, 166, 35, 0.3);
+      color: var(--text);
+      padding: 0.8rem 1.2rem;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+      text-align: center;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      z-index: 10;
+      animation: floatY 4s ease-in-out infinite;
+    }
+
+    .floating-urgency strong {
+      color: var(--orange);
+      font-size: 1.05rem;
+      display: block;
+      margin-top: 0.2rem;
+    }
+
+    @keyframes floatY {
+      0% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+
+      100% {
+        transform: translateY(0);
+      }
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5rem 2rem 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(90deg, transparent 49%, rgba(245, 166, 35, 0.1) 50%, transparent 51%),
+        linear-gradient(0deg, transparent 49%, rgba(245, 166, 35, 0.1) 50%, transparent 51%);
+      background-size: 80px 80px;
+      mask-image: radial-gradient(ellipse 75% 75% at 50% 50%, black 20%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 75% 75% at 50% 50%, black 20%, transparent 100%);
+      z-index: 0;
+      animation: gridPulse 4s ease-in-out infinite;
+    }
+
+    @keyframes gridPulse {
+
+      0%,
+      100% {
+        opacity: 0.3;
+      }
+
+      50% {
+        opacity: 0.6;
+      }
+    }
+
+    /* Glow géré en JS via style.left/top en px */
+    .hero-glow {
+      position: absolute;
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, rgba(245, 166, 35, 0.09) 0%, transparent 65%);
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: left 0.4s ease-out, top 0.4s ease-out;
+      z-index: 1;
+      top: 30%;
+      left: 35%;
+    }
+
+    .hero-inner {
+      position: relative;
+      max-width: 600px;
+      z-index: 2;
+      flex-shrink: 0;
+    }
+
+    /* ── BADGE PREMIUM 3D ── */
+    .badge-container {
+      width: 380px;
+      height: 380px;
+      flex-shrink: 0;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .badge-tilt {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--orange);
+      text-shadow: 0 8px 32px rgba(245, 166, 35, 0.25);
+      transition: text-shadow 0.3s ease;
+    }
+
+    .badge-tilt:hover {
+      text-shadow: 0 8px 40px rgba(245, 166, 35, 0.40);
+      background: none !important;
+      border: none !important;
+    }
+
+    .text-counter {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 8rem;
+      line-height: 1;
+      transform: translateZ(50px);
+    }
+
+    .text-experience {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0;
+      transform: translateZ(30px) translateY(20px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      text-align: center;
+    }
+
+    .text-experience.visible {
+      opacity: 1;
+      transform: translateZ(30px) translateY(0);
+    }
+
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--orange);
+      font-weight: 500;
+      margin-bottom: 1.2rem;
+    }
+
+    .hero-badge::before {
+      content: '';
+      display: block;
+      width: 22px;
+      height: 1px;
+      background: var(--orange);
+    }
+
+    .hero-band {
+      display: block;
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.85);
+      font-weight: 300;
+      letter-spacing: 0.02em;
+      margin-top: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-top: 1px solid rgba(245, 166, 35, 0.4);
+      padding-top: 0.8rem;
+      max-width: 480px;
+    }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.2rem, 9vw, 7.5rem);
+      line-height: 0.92;
+      letter-spacing: 0.02em;
+      color: #fff;
+      margin-bottom: 1.8rem;
+      position: relative;
+      /* Pour positionner les étincelles */
+    }
+
+    /* em reste orange — cohérence identité */
+    h1 em {
+      color: var(--orange);
+      font-style: normal;
+    }
+
+    .electric-spark {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #00D4FF;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #00D4FF, 0 0 16px #00D4FF;
+      pointer-events: none;
+      animation: sparkFade 200ms ease-out forwards;
+    }
+
+    @keyframes sparkFade {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(3) translateY(-10px);
+        opacity: 0;
+      }
+    }
+
+    .hero-desc {
+      font-size: 1rem;
+      line-height: 1.75;
+      color: var(--muted);
+      max-width: 460px;
+      margin-bottom: 1.8rem;
+    }
+
+    .stat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.6rem 1.2rem;
+      margin-bottom: 2.2rem;
+      background: rgba(245, 166, 35, 0.05);
+    }
+
+    .stat-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      line-height: 1;
+      color: var(--orange);
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      line-height: 1.4;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    /* BUTTONS */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--orange);
+      color: #000;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 0.85rem 1.8rem;
+      border-radius: 4px;
+      text-decoration: none;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      box-shadow: 0 4px 14px rgba(245, 166, 35, 0.15);
+    }
+
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+
+    .btn-primary:hover {
+      background: var(--orange2);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 6px 20px rgba(245, 166, 35, 0.3);
+    }
+
+    .btn-primary:hover::after {
+      border-color: rgba(245, 166, 35, 0.6);
+      box-shadow: 0 0 10px rgba(245, 166, 35, 0.4), inset 0 0 10px rgba(245, 166, 35, 0.2);
+      animation: btnPulse 1.5s ease-in-out infinite;
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 0.85rem 1.8rem;
+      border-radius: 4px;
+      text-decoration: none;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .btn-secondary::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--orange);
+      color: #fff;
+      transform: translateY(-3px) scale(1.02);
+      background: rgba(245, 166, 35, 0.05);
+    }
+
+    .btn-secondary:hover::after {
+      border-color: rgba(0, 212, 255, 0.4);
+      box-shadow: 0 0 10px rgba(0, 212, 255, 0.3), inset 0 0 10px rgba(0, 212, 255, 0.1);
+      animation: btnPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes btnPulse {
+
+      0%,
+      100% {
+        opacity: 0.5;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.02);
+      }
+    }
+
+    /* LAYOUT */
+    section {
+      padding: 5rem 2rem;
+      position: relative;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    .section-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--orange);
+      font-weight: 500;
+      margin-bottom: 0.6rem;
+    }
+
+    h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.8rem, 4.5vw, 3.2rem);
+      color: #fff;
+      letter-spacing: 0.03em;
+      margin-bottom: 1rem;
+    }
+
+    /* SERVICES */
+    .services-intro {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.7;
+      max-width: 500px;
+      margin-bottom: 2.5rem;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .service-card {
+      background: var(--dark2);
+      padding: 2rem 1.8rem;
+      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid transparent;
+    }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(245, 166, 35, 0.06), transparent 40%);
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .service-card:hover {
+      background: var(--dark3);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border-color: rgba(245, 166, 35, 0.2);
+    }
+
+    .service-card:hover::before {
+      opacity: 1;
+    }
+
+    .service-icon {
+      font-size: 1.6rem;
+      margin-bottom: 0.9rem;
+      transition: transform 0.3s ease, filter 0.3s ease;
+      display: inline-block;
+      position: relative;
+      z-index: 2;
+    }
+
+    .service-card:hover .service-icon {
+      transform: scale(1.1) translateY(-2px);
+      filter: var(--glow);
+    }
+
+    .service-card h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: 0.05em;
+      color: #fff;
+      margin-bottom: 0.5rem;
+      position: relative;
+      z-index: 2;
+      transition: color 0.3s;
+    }
+
+    .service-card:hover h3 {
+      color: var(--orange);
+    }
+
+    .service-card p {
+      font-size: 0.87rem;
+      color: var(--muted);
+      line-height: 1.6;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ZONE */
+    .zone-section {
+      background: var(--dark2);
+    }
+
+    .zone-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .zone-text {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .zone-text p {
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+
+    .zone-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .zone-tag {
+      font-size: 0.8rem;
+      padding: 0.35rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: var(--muted);
+      transition: all 0.4s ease;
+      opacity: 0.6;
+    }
+
+    .zone-tag.active {
+      border-color: var(--blue);
+      color: var(--blue);
+      opacity: 1;
+      box-shadow: 0 0 15px rgba(0, 243, 255, 0.15);
+      background: rgba(0, 243, 255, 0.05);
+    }
+
+    .zone-tag:hover {
+      border-color: var(--blue);
+      color: #fff;
+      opacity: 1;
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+    }
+
+    /* CARTE 3D */
+    .zone-visual {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .proximity-label {
+      text-align: center;
+      color: var(--orange);
+      font-size: 1.1rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      width: 100%;
+      margin-bottom: 1.2rem;
+    }
+
+    .proximity-label strong {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    #holo-map-container {
+      width: 100%;
+      max-width: 420px;
+      aspect-ratio: 1 / 1;
+      position: relative;
+    }
+
+    .holo-base {
+      position: absolute;
+      bottom: 8%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 55%;
+      height: 16px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(0, 243, 255, 0.35) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #holo-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* Labels 2D positionnés en absolute dans le container */
+    #holo-labels {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .city-label {
+      position: absolute;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      color: var(--blue);
+      text-shadow: 0 0 8px rgba(0, 243, 255, 0.5);
+      transform: translate(-50%, -130%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      white-space: nowrap;
+    }
+
+    .city-label.active {
+      opacity: 1;
+    }
+
+    .city-label.center-city {
+      color: var(--orange);
+      text-shadow: 0 0 10px rgba(245, 166, 35, 0.7);
+      opacity: 1;
+      font-size: 0.9rem;
+    }
+
+    /* CTA BAND */
+    .cta-band {
+      background: var(--orange);
+      padding: 3.5rem 2rem;
+      text-align: center;
+    }
+
+    .cta-band h2 {
+      color: #000;
+      margin-bottom: 0.8rem;
+    }
+
+    .cta-band p {
+      color: rgba(0, 0, 0, 0.6);
+      margin-bottom: 2rem;
+      font-size: 1.05rem;
+    }
+
+    .btn-dark {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: #000;
+      color: var(--orange);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 1rem;
+      padding: 1rem 2.5rem;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    .btn-dark:hover {
+      transform: translateY(-2px);
+      opacity: 0.9;
+    }
+
+    /* CONTACT */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 2rem;
+    }
+
+    .contact-item {
+      background: var(--dark2);
+      padding: 1.8rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+    }
+
+    .contact-item:hover {
+      background: var(--dark3);
+      border-color: rgba(245, 166, 35, 0.15);
+      transform: scale(1.01);
+    }
+
+    .contact-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .contact-value {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #fff;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    a.contact-value:hover {
+      color: var(--orange);
+    }
+
+    .contact-sub {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--dark);
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 0.77rem;
+      color: var(--muted);
+      line-height: 1.9;
+    }
+
+    .footer-dim {
+      color: #333;
+    }
+
+    /* SCROLL REVEAL */
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    .reveal-d1 {
+      transition-delay: 0.08s;
+    }
+
+    .reveal-d2 {
+      transition-delay: 0.16s;
+    }
+
+    .reveal-d3 {
+      transition-delay: 0.24s;
+    }
+
+    .reveal-d4 {
+      transition-delay: 0.32s;
+    }
+
+    @keyframes glitchReveal {
+      0% {
+        opacity: 0;
+        transform: translate(-5px, 5px);
+        filter: drop-shadow(-2px 0 0 #00f3ff) drop-shadow(2px 0 0 #F5A623);
+      }
+
+      10% {
+        opacity: 1;
+        transform: translate(5px, -5px);
+        filter: drop-shadow(2px 0 0 #00f3ff) drop-shadow(-2px 0 0 #F5A623);
+      }
+
+      20% {
+        opacity: 0;
+        transform: translate(-5px, 5px);
+      }
+
+      30% {
+        opacity: 1;
+        transform: translate(5px, -5px);
+      }
+
+      40% {
+        opacity: 0.8;
+        transform: translate(-2px, 2px);
+        filter: drop-shadow(-1px 0 0 #00f3ff);
+      }
+
+      50% {
+        opacity: 1;
+        transform: translate(0, 0);
+        filter: none;
+      }
+
+      100% {
+        opacity: 1;
+        transform: translate(0, 0);
+        filter: none;
+      }
+    }
+
+    /* TYPOGRAPHIE PRESTATIONS */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .anim-1 {
+      animation: fadeUp 0.55s 0.05s ease both;
+    }
+
+    .anim-2 {
+      animation: fadeUp 0.55s 0.18s ease both;
+    }
+
+    .anim-3 {
+      animation: fadeUp 0.55s 0.28s ease both;
+    }
+
+    .anim-4 {
+      animation: fadeUp 0.55s 0.36s ease both;
+    }
+
+    .anim-5 {
+      animation: fadeUp 0.55s 0.44s ease both;
+    }
+
+    .anim-6 {
+      animation: fadeUp 0.55s 0.52s ease both;
+    }
+
+
+    /* ── BOUTON BACK-TO-TOP ── */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    #back-to-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 200;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--dark2);
+      border: 1px solid rgba(245, 166, 35, 0.35);
+      color: var(--orange);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      text-decoration: none;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s, background 0.2s, transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    #back-to-top.visible {
+      opacity: 1;
+      pointer-events: auto;
+      animation: fadeInUp 0.35s ease both;
+    }
+
+    #back-to-top:hover {
+      background: var(--orange);
+      color: #000;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(245, 166, 35, 0.3);
+    }
+
+    #back-to-top svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 700px) {
+      nav {
+        padding: 0.9rem 1.2rem;
+      }
+
+      .hero {
+        padding: 7rem 1.2rem 3.5rem;
+      }
+
+      section {
+        padding: 3.5rem 1.2rem;
+      }
+
+      .services-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .zone-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .zone-visual {
+        margin-top: 2rem;
+      }
+
+      #holo-map-container {
+        max-width: 300px;
+      }
+
+      .contact-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-logo-text {
+        display: none;
+      }
+
+      .badge-container {
+        width: 260px;
+        height: 260px;
+      }
+
+
+      .hero-wrapper {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .hero-actions {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo" aria-label="Henry Fabien Électricien — accueil">
+      <svg viewBox="0 0 216 54" width="108" height="27" fill="none" xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true">
+        <rect x="0" y="24" width="9" height="6" rx="1" fill="none" stroke="#4e6a84" stroke-width="1.5" />
+        <line x1="9" y1="27" x2="16" y2="27" stroke="#4e6a84" stroke-width="2" />
+        <polygon points="16,22 16,32 24,27" fill="#4e6a84" />
+        <line x1="24" y1="22" x2="24" y2="32" stroke="#4e6a84" stroke-width="1.5" />
+        <line x1="24" y1="27" x2="30" y2="27" stroke="#4e6a84" stroke-width="2" />
+        <circle cx="46" cy="27" r="15" fill="none" stroke="#4e6a84" stroke-width="1.5" />
+        <path d="M46 19 a7 7 0 0 1 4 12.5 V34 H42 V31.5 A7 7 0 0 1 46 19z" fill="#F5A623" opacity="0.9" />
+        <rect x="42" y="34" width="8" height="2" rx="1" fill="#F5A623" opacity="0.7" />
+        <line x1="61" y1="27" x2="66" y2="27" stroke="#4e6a84" stroke-width="2" />
+        <rect x="66" y="23" width="13" height="8" rx="2" fill="#4e6a84" opacity="0.6" />
+        <line x1="72" y1="23" x2="72" y2="17" stroke="#4e6a84" stroke-width="1.5" />
+        <circle cx="72" cy="15.5" r="2.5" fill="#F5A623" />
+        <line x1="79" y1="27" x2="84" y2="27" stroke="#4e6a84" stroke-width="2" />
+        <circle cx="99" cy="27" r="15" fill="none" stroke="#4e6a84" stroke-width="1.5" />
+        <rect x="91" y="22" width="16" height="12" rx="3" fill="#F5A623" opacity="0.85" />
+        <line x1="96" y1="19" x2="96" y2="22" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round" />
+        <line x1="102" y1="19" x2="102" y2="22" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round" />
+        <line x1="99" y1="34" x2="99" y2="38" stroke="#F5A623" stroke-width="2" stroke-linecap="round" />
+        <line x1="114" y1="27" x2="119" y2="27" stroke="#4e6a84" stroke-width="2" />
+        <rect x="119" y="23" width="13" height="8" rx="2" fill="#4e6a84" opacity="0.6" />
+        <line x1="125" y1="31" x2="125" y2="37" stroke="#4e6a84" stroke-width="1.5" />
+        <circle cx="125" cy="38.5" r="2.5" fill="#F5A623" />
+        <line x1="132" y1="27" x2="137" y2="27" stroke="#4e6a84" stroke-width="2" />
+        <circle cx="152" cy="27" r="15" fill="none" stroke="#4e6a84" stroke-width="1.5" />
+        <polygon points="155,18 148,27 153,27 149,36 157,25 152,25" fill="#F5A623" />
+        <line x1="167" y1="27" x2="172" y2="27" stroke="#4e6a84" stroke-width="2" />
+        <polygon points="172,22 172,32 180,27" fill="#4e6a84" />
+        <line x1="180" y1="22" x2="180" y2="32" stroke="#4e6a84" stroke-width="1.5" />
+        <line x1="180" y1="27" x2="186" y2="27" stroke="#4e6a84" stroke-width="2" />
+        <line x1="186" y1="20" x2="186" y2="34" stroke="#4e6a84" stroke-width="1.5" />
+        <line x1="189" y1="20" x2="189" y2="34" stroke="#4e6a84" stroke-width="1.5" />
+        <line x1="189" y1="27" x2="196" y2="27" stroke="#4e6a84" stroke-width="2" />
+        <rect x="196" y="22" width="10" height="10" rx="1" fill="none" stroke="#4e6a84" stroke-width="1.5" />
+      </svg>
+      <span class="nav-logo-text">Henry Fabien</span>
+    </a>
+    <a href="tel:0625170665" class="nav-tel">📞 06 25 17 06 65</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="hero-section" aria-label="Présentation">
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="hero-glow" id="hero-glow" aria-hidden="true"></div>
+
+
+    <div class="hero-wrapper">
+      <div class="hero-inner">
+
+
+        <div class="hero-badge anim-2">Électricien Indépendant · Pyrénées-Atlantiques</div>
+        <h1 id="hero-title" style="opacity: 0; transition: opacity 0.1s;">L'électricité,<br><em>sans complication.</em>
+        </h1>
+        <div class="hero-band anim-3">
+          Plus de 25 ans d'expérience, dont 12 ans à votre service dans les Pyrénées-Atlantiques
+        </div>
+        <div class="hero-actions anim-5">
+          <a href="tel:0625170665" class="btn-primary">⚡ Appeler maintenant</a>
+          <a href="#services" class="btn-secondary">Voir les prestations →</a>
+        </div>
+      </div>
+      <!-- COMPTEUR ANIMÉ -->
+      <div class="badge-container anim-6" aria-label="25 ans d'expérience">
+        <div class="badge-tilt">
+          <div class="text-counter" id="experience-counter">0</div>
+          <div class="text-experience" id="experience-text">ans<br />d'expérience</div>
+        </div>
+      </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SERVICES -->
+  <section id="services" aria-labelledby="services-title">
+    <div class="container">
+      <div class="section-label reveal">Ce que je fais</div>
+      <h2 id="services-title" class="reveal reveal-d1">Prestations</h2>
+      <p class="services-intro reveal reveal-d2">
+        Dépannage d'urgence ou rénovation complète — j'interviens sur tous types de travaux électriques avec la rigueur
+        de 25 ans de métier.
+      </p>
+      <div class="services-grid">
+        <div class="service-card reveal reveal-d1">
+          <div class="service-icon">🔧</div>
+          <h3>Dépannage</h3>
+          <p>Panne, disjoncteur qui saute, prise défectueuse. Intervention rapide pour rétablir le courant.</p>
+        </div>
+        <div class="service-card reveal reveal-d2">
+          <div class="service-icon">⚙️</div>
+          <h3>Installation</h3>
+          <p>Tableaux électriques, prises, interrupteurs, éclairage. Neuf ou en remplacement.</p>
+        </div>
+        <div class="service-card reveal reveal-d3">
+          <div class="service-icon">📋</div>
+          <h3>Mise aux normes</h3>
+          <p>Conformité NF C 15-100. Certificat Consuel, diagnostic pour vente ou location.</p>
+        </div>
+        <div class="service-card reveal reveal-d4">
+          <div class="service-icon">🏠</div>
+          <h3>Rénovation</h3>
+          <p>Réfection complète de l'installation électrique d'un appartement, d'une maison ou d'un local.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ZONE -->
+  <section class="zone-section" id="zone" aria-labelledby="zone-title">
+    <div class="container">
+      <div class="zone-content">
+        <div class="zone-text">
+          <div class="section-label reveal">Où j'interviens</div>
+          <h2 id="zone-title" class="reveal reveal-d1">Zone d'intervention</h2>
+          <p class="reveal reveal-d2">Basé à Lanne en Barétous (64570), j'interviens dans tout le piémont pyrénéen et
+            les communes alentour.</p>
+          <div class="zone-tags reveal reveal-d3">
+            <span class="zone-tag" id="tag-mauleon">Mauléon-Licharre</span>
+            <span class="zone-tag" id="tag-oloron">Oloron-Sainte-Marie</span>
+            <span class="zone-tag" id="tag-arette">Arette</span>
+            <span class="zone-tag" id="tag-navarrenx">Navarrenx</span>
+            <span class="zone-tag" id="tag-lapierresm">La Pierre Saint-Martin</span>
+            <span class="zone-tag" id="tag-arudy">Arudy</span>
+            <span class="zone-tag" id="tag-mourenx">Mourenx</span>
+            <span class="zone-tag" id="tag-orthez">Orthez</span>
+            <span class="zone-tag" id="tag-pau">Pau</span>
+          </div>
+        </div>
+        <div class="zone-visual reveal reveal-d2">
+          <div class="proximity-label">Votre électricien de proximité<br>📍 <strong>Lanne-en-Barétous</strong></div>
+          <div id="holo-map-container" aria-label="Carte animée de la zone d'intervention">
+            <div class="holo-base" aria-hidden="true"></div>
+            <div id="holo-canvas"></div>
+            <div id="holo-labels"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BAND -->
+  <div class="cta-band">
+    <h2>Un problème électrique ?</h2>
+    <p>Contactez-moi directement. Je réponds vite.</p>
+    <a href="tel:0625170665" class="btn-dark">⚡ 06 25 17 06 65</a>
+  </div>
+
+  <!-- CONTACT -->
+  <section id="contact" aria-labelledby="contact-title">
+    <div class="container">
+      <div class="section-label reveal">Me joindre</div>
+      <h2 id="contact-title" class="reveal reveal-d1">Contact</h2>
+      <div class="contact-grid">
+        <div class="contact-item reveal reveal-d1">
+          <span class="contact-label">Téléphone</span>
+          <a href="tel:0625170665" class="contact-value">06 25 17 06 65</a>
+        </div>
+        <div class="contact-item reveal reveal-d2">
+          <span class="contact-label">Email</span>
+          <a href="/cdn-cgi/l/email-protection#4d2528233f342b2c2f24282374787f7e7d0d22383921222226632b3f"
+            class="contact-value"><span class="__cf_email__"
+              data-cfemail="2a424f4458534c4b48434f44131f18191a6a455f5e46454541044c58">[email&#160;protected]</span></a>
+        </div>
+        <div class="contact-item reveal reveal-d3">
+          <span class="contact-label">Adresse</span>
+          <span class="contact-value">66 Rue Matachot</span>
+          <span class="contact-sub">64570 Lanne en Barétous</span>
+        </div>
+        <div class="contact-item reveal reveal-d4">
+          <span class="contact-label">Activité</span>
+          <span class="contact-value">Électricien indépendant</span>
+          <span class="contact-sub">Entreprise individuelle (EI)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>
+      Henry Fabien — Électricien · 66 Rue Matachot, 64570 Lanne en Barétous<br>
+      TVA non applicable, article 293 B du CGI<br>
+      <span class="footer-dim">© 2026 Henry Fabien. Tous droits réservés.</span>
+    </p>
+  </footer>
+  <!-- BOUTON BACK TO TOP -->
+  <a href="#hero-section" id="back-to-top" aria-label="Retour en haut de page">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+      stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15" />
+    </svg>
+  </a>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+  <script>
+    // ─── SCROLL REVEAL ───
+    const obs = new IntersectionObserver(
+      entries => entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+      }),
+      { threshold: 0.12 }
+    );
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+    // ─── EFFET COURT-CIRCUIT SUR TITRE ───
+    function typewriterElectric(element) {
+      element.style.opacity = '1';
+      element.style.animation = 'glitchReveal 1.2s ease-out forwards';
+    }
+
+    // ─── FOND THREE.JS RESEAU ELECTRIQUE ───
+    let heroScene, heroCamera, heroRenderer, heroParticles, heroLines, heroNodes = [];
+    let mouseVector = { x: 0, y: 0 }; // Plain object — THREE pas encore dispo ici (defer)
+
+    function initElectricalGrid() {
+      const hero = document.getElementById('hero-section');
+      if (!hero || typeof THREE === 'undefined') return;
+
+      const canvas = document.createElement('canvas');
+      canvas.id = 'hero-particles';
+      canvas.style.position = 'absolute';
+      canvas.style.inset = '0';
+      canvas.style.top = '0';
+      canvas.style.zIndex = '0';
+      canvas.style.pointerEvents = 'none';
+      hero.insertBefore(canvas, hero.firstChild);
+
+      heroScene = new THREE.Scene();
+      heroCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      heroCamera.position.z = 150;
+
+      heroRenderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+      heroRenderer.setSize(window.innerWidth, hero.offsetHeight);
+      heroRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      const particleCount = 80;
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(particleCount * 3);
+
+      for (let i = 0; i < particleCount; i++) {
+        // Position aléatoire sur les axes X, Y, dispersés sur -150 à +150
+        const x = (Math.random() - 0.5) * 400;
+        const y = (Math.random() - 0.5) * 300;
+        const z = (Math.random() - 0.5) * 100 - 50; // Profondeur
+
+        positions[i * 3] = x;
+        positions[i * 3 + 1] = y;
+        positions[i * 3 + 2] = z;
+
+        heroNodes.push({
+          baseX: x, baseY: y, baseZ: z,
+          current: new THREE.Vector3(x, y, z),
+          target: new THREE.Vector3(x, y, z),
+          vx: 0, vy: 0 // Vélocité pour le champ de force
+        });
+      }
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+      const pMaterial = new THREE.PointsMaterial({
+        color: 0x4e6a84,
+        size: 2.5,
+        transparent: true,
+        opacity: 0.6
+      });
+
+      heroParticles = new THREE.Points(geometry, pMaterial);
+      heroScene.add(heroParticles);
+
+      // Lignes de connexion
+      const lineMat = new THREE.LineBasicMaterial({
+        color: 0xF5A623,
+        transparent: true,
+        opacity: 0.15
+      });
+      heroLines = new THREE.LineSegments(new THREE.BufferGeometry(), lineMat);
+      heroScene.add(heroLines);
+
+      animateElectricalGrid();
+    }
+
+    let scrollYOffset = 0;
+
+    function animateElectricalGrid() {
+      requestAnimationFrame(animateElectricalGrid);
+
+      const positions = heroParticles.geometry.attributes.position.array;
+      const linesPositions = [];
+      const linesColors = [];
+
+      // Update des positions (interaction souris + décharge au scroll)
+      for (let i = 0; i < heroNodes.length; i++) {
+        const node = heroNodes[i];
+
+        // Mouvement de base lent (flottement)
+        const time = Date.now() * 0.0005;
+        node.target.x = node.baseX + Math.sin(time + i) * 10;
+        node.target.y = node.baseY + Math.cos(time + i * 1.5) * 10 - scrollYOffset * 0.5; // Discharge vers le bas au scroll
+
+        // Interaction souris : force répulsive
+        if (mouseVector.x !== 0 && mouseVector.y !== 0) {
+          const dx = node.current.x - mouseVector.x;
+          const dy = node.current.y - mouseVector.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 60) {
+            const force = (60 - dist) / 60;
+            node.target.x += (dx / dist) * force * 30;
+            node.target.y += (dy / dist) * force * 30;
+          }
+        }
+
+        // Interpolation douce
+        node.current.x += (node.target.x - node.current.x) * 0.02;
+        node.current.y += (node.target.y - node.current.y) * 0.02;
+
+        positions[i * 3] = node.current.x;
+        positions[i * 3 + 1] = node.current.y;
+        positions[i * 3 + 2] = node.current.z;
+
+        // Lignes de connexion
+        for (let j = i + 1; j < heroNodes.length; j++) {
+          const node2 = heroNodes[j];
+          const dx = node.current.x - node2.current.x;
+          const dy = node.current.y - node2.current.y;
+          const dz = node.current.z - node2.current.z;
+          const distSq = dx * dx + dy * dy + dz * dz;
+
+          const maxDist = 3000;
+          if (distSq < maxDist) {
+            linesPositions.push(
+              node.current.x, node.current.y, node.current.z,
+              node2.current.x, node2.current.y, node2.current.z
+            );
+          }
+        }
+      }
+
+      heroParticles.geometry.attributes.position.needsUpdate = true;
+      heroLines.geometry.setAttribute('position', new THREE.Float32BufferAttribute(linesPositions, 3));
+      heroLines.material.opacity = Math.max(0, 0.15 - (scrollYOffset * 0.0005));
+      heroParticles.material.opacity = Math.max(0, 0.6 - (scrollYOffset * 0.001));
+
+      heroRenderer.render(heroScene, heroCamera);
+    }
+
+    // ─── INIT SYSTEMES HERO ET CARTE ───
+    window.addEventListener('load', () => {
+      // Démarrage Map
+      try {
+        initHoloMap();
+      } catch (e) {
+        console.error("Erreur initHoloMap:", e);
+      }
+
+      // Init Particles
+      try {
+        initElectricalGrid();
+      } catch (e) {
+        console.error("Erreur initElectricalGrid:", e);
+      }
+
+      // Effet Typed Titre (léger délai)
+      setTimeout(() => {
+        try {
+          const titleEl = document.getElementById('hero-title');
+          if (titleEl) typewriterElectric(titleEl);
+        } catch (e) {
+          console.error("Erreur typewriterElectric:", e);
+        }
+      }, 500);
+
+      // Init Eclair désactivé
+
+      // ─── COMPTEUR 25 ANS & EFFET TILT ───
+      try {
+        const tiltEl = document.querySelector('.badge-tilt');
+        const counterEl = document.getElementById('experience-counter');
+        const textEl = document.getElementById('experience-text');
+
+        if (tiltEl && typeof VanillaTilt !== 'undefined') {
+          // Initialiser Vanilla-Tilt
+          VanillaTilt.init(tiltEl, {
+            max: 12,
+            speed: 600,
+            glare: true,
+            'max-glare': 0.12,
+            perspective: 1000,
+            scale: 1.03,
+            gyroscope: true
+          });
+        }
+
+        let counterStarted = false;
+        const startCounter = () => {
+          if (counterStarted || !counterEl) return;
+          counterStarted = true;
+          let count = 0;
+          const target = 25;
+          const duration = 3500; // ms
+          const incrementTime = Math.floor(duration / target);
+
+          const timer = setInterval(() => {
+            count++;
+            if (counterEl) counterEl.textContent = count;
+            if (count >= target) {
+              clearInterval(timer);
+              if (textEl) textEl.classList.add('visible');
+            }
+          }, incrementTime);
+        };
+
+        const counterObserver = new IntersectionObserver((entries) => {
+          if (entries[0].isIntersecting) {
+            startCounter();
+            counterObserver.disconnect();
+          }
+        }, { threshold: 0.5 });
+
+        if (tiltEl) {
+          counterObserver.observe(tiltEl);
+        }
+      } catch (e) {
+        console.error("Erreur Compteur/Tilt:", e);
+      }
+    });
+
+    // ─── GLOW SOURIS HERO ET CARTES SERVICES ───
+    const heroSection = document.getElementById('hero-section');
+    const heroGlow = document.getElementById('hero-glow');
+    if (heroSection && heroGlow) {
+      heroSection.addEventListener('mousemove', (e) => {
+        const rect = heroSection.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        heroGlow.style.left = x + 'px';
+        heroGlow.style.top = y + 'px';
+
+        // Mettre à jour la position souris pour ThreeJS particles
+        // Transformation canvas coordinates to world coordinates (-X to X, Y to -Y)
+        if (typeof heroCamera !== 'undefined') {
+          // On fait une approximation simple pour que les points réagissent au curseur 2D
+          mouseVector.x = (x - rect.width / 2) * 0.3;
+          mouseVector.y = -(y - rect.height / 2) * 0.3;
+        }
+      });
+      // Sortie du curseur
+      heroSection.addEventListener('mouseleave', () => {
+        mouseVector.x = 0;
+        mouseVector.y = 0;
+      });
+    }
+
+    // ─── SCROLL DISCHARGE CAPTURE ───
+    window.addEventListener('scroll', () => {
+      scrollYOffset = window.scrollY;
+    }, { passive: true });
+
+    // Effet Spotlight sur les cartes de service
+    document.querySelectorAll('.service-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+      });
+    });
+
+    // ─── CARTE 3D THREE.JS ───
+    function initHoloMap() {
+      const wrapper = document.getElementById('holo-map-container');
+      const canvasWrapper = document.getElementById('holo-canvas');
+      const labelWrapper = document.getElementById('holo-labels');
+      if (!wrapper || !canvasWrapper || typeof THREE === 'undefined') return;
+
+      // On lit les dimensions après que le DOM est visible
+      const W = wrapper.clientWidth || 380;
+      const H = wrapper.clientHeight || 380;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 1000);
+      camera.position.set(0, 10, 14);
+      camera.lookAt(0, 0, 0);
+
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer.setSize(W, H);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.domElement.style.display = 'block'; // évite pixel fantôme
+      canvasWrapper.appendChild(renderer.domElement);
+
+      const mapGroup = new THREE.Group();
+      scene.add(mapGroup);
+
+      // GridHelper r128 : material est un tableau [centerMat, gridMat]
+      const grid = new THREE.GridHelper(16, 16, 0x00f3ff, 0x4e6a84);
+      [].concat(grid.material).forEach(m => { m.transparent = true; m.opacity = 0.12; });
+      mapGroup.add(grid);
+
+      // Cercles concentriques manuels pour l'effet radar
+      for (let r = 2; r <= 8; r += 2) {
+        const pts = [];
+        for (let i = 0; i <= 64; i++) {
+          const a = (i / 64) * Math.PI * 2;
+          pts.push(new THREE.Vector3(Math.cos(a) * r, 0, Math.sin(a) * r));
+        }
+        const geo = new THREE.BufferGeometry().setFromPoints(pts);
+        const mat = new THREE.LineBasicMaterial({ color: 0x00f3ff, transparent: true, opacity: 0.08 });
+        mapGroup.add(new THREE.Line(geo, mat));
+      }
+
+      const cities = [
+        { name: 'Lanne-en-Barétous', pos: new THREE.Vector3(-3, 0, 3),    isCenter: true, tagId: 'tag-lanne' },
+        { name: 'Mauléon',           pos: new THREE.Vector3(-5, 0, 1.5),   delay: 0.5,  tagId: 'tag-mauleon' },
+        { name: 'Oloron',            pos: new THREE.Vector3(-0.5, 0, 1.5), delay: 1.2,  tagId: 'tag-oloron' },
+        { name: 'Arette',            pos: new THREE.Vector3(-2.0, 0, 6.0), delay: 1.9,  tagId: 'tag-arette' },
+        { name: 'Navarrenx',         pos: new THREE.Vector3(-2.5, 0, -1),  delay: 2.6,  tagId: 'tag-navarrenx' },
+        { name: 'La Pierre St-M.',   pos: new THREE.Vector3(-1.5, 0, 7.8), delay: 3.3,  tagId: 'tag-lapierresm' },
+        { name: 'Arudy',             pos: new THREE.Vector3(1.8, 0, 0.5),  delay: 4.0,  tagId: 'tag-arudy' },
+        { name: 'Mourenx',           pos: new THREE.Vector3(1.5, 0, -3.0), delay: 4.7,  tagId: 'tag-mourenx' },
+        { name: 'Orthez',            pos: new THREE.Vector3(-1, 0, -4.5),  delay: 5.4,  tagId: 'tag-orthez' },
+        { name: 'Pau',               pos: new THREE.Vector3(4, 0, -2),     delay: 6.1,  tagId: 'tag-pau' }
+      ];
+
+      const cityObjects = [];
+      const arcs = [];
+      const centerPos = cities[0].pos;
+
+      cities.forEach(city => {
+        const geo = new THREE.SphereGeometry(city.isCenter ? 0.28 : 0.14, 16, 16);
+        const mat = new THREE.MeshBasicMaterial({
+          color: city.isCenter ? 0xF5A623 : 0x4e6a84,
+          transparent: !city.isCenter,
+          opacity: city.isCenter ? 1 : 0.5
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.copy(city.pos);
+        mapGroup.add(mesh);
+
+        // Halo pour la ville centre — couleur orange, amplitude réduite
+        if (city.isCenter) {
+          const haloGeo = new THREE.SphereGeometry(0.42, 24, 24);
+          const haloMat = new THREE.MeshBasicMaterial({ color: 0xF5A623, transparent: true, opacity: 0.20, blending: THREE.AdditiveBlending });
+          mesh.add(new THREE.Mesh(haloGeo, haloMat));
+        }
+
+        // Label DOM
+        const label = document.createElement('div');
+        label.className = 'city-label' + (city.isCenter ? ' center-city' : '');
+        label.textContent = city.name;
+        labelWrapper.appendChild(label);
+
+        const domTag = document.getElementById(city.tagId);
+        cityObjects.push({ data: city, mesh, label, domTag });
+
+        // Arc vers les villes secondaires
+        if (!city.isCenter) {
+          const mid = new THREE.Vector3(
+            (centerPos.x + city.pos.x) / 2,
+            centerPos.distanceTo(city.pos) * 0.38,
+            (centerPos.z + city.pos.z) / 2
+          );
+          const curve = new THREE.QuadraticBezierCurve3(centerPos, mid, city.pos);
+          const points = curve.getPoints(50);
+          const arcGeo = new THREE.BufferGeometry().setFromPoints(points);
+          arcGeo.setDrawRange(0, 0);
+          const arcMat = new THREE.LineBasicMaterial({
+            color: 0xF5A623, transparent: true, opacity: 0.75,
+            blending: THREE.AdditiveBlending
+          });
+          const line = new THREE.Line(arcGeo, arcMat);
+          mapGroup.add(line);
+          arcs.push({ line, arcGeo, targetCity: cityObjects[cityObjects.length - 1], delay: city.delay, progress: 0 });
+        }
+      });
+
+      const clock = new THREE.Clock();
+      const loopDuration = 9.0;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const time = clock.getElapsedTime();
+        const cycleTime = time % loopDuration;
+        const halfW = wrapper.clientWidth / 2;
+        const halfH = wrapper.clientHeight / 2;
+
+        // Rotation lente
+        mapGroup.rotation.y = time * 0.12;
+        mapGroup.rotation.x = Math.sin(time * 0.5) * 0.05;
+        mapGroup.rotation.z = Math.cos(time * 0.3) * 0.05;
+
+        // Pulsation ville centre
+        const pulse = 1 + Math.sin(time * 4) * 0.08;
+        cityObjects[0].mesh.scale.setScalar(pulse);
+
+        // Tag Lanne allumé dès le début du cycle, éteint à la fin
+        const isActivePhase = cycleTime < loopDuration - 0.4;
+        const centerTag = cityObjects[0].domTag;
+        if (centerTag) {
+          centerTag.classList.toggle('active', isActivePhase);
+        }
+
+        // Progression des arcs et synchronisation des étiquettes
+        arcs.forEach(arc => {
+          if (isActivePhase && cycleTime > arc.delay) {
+            arc.progress = Math.min((cycleTime - arc.delay) * 2.2, 1.0);
+          } else {
+            // Réinitialisation en fin de cycle ou avant le délai de départ
+            arc.progress = 0;
+            arc.targetCity.mesh.material.color.setHex(0x4e6a84);
+            arc.targetCity.mesh.material.opacity = 0.5;
+            if (arc.targetCity.domTag) arc.targetCity.domTag.classList.remove('active');
+            arc.targetCity.label.classList.remove('active');
+          }
+
+          arc.arcGeo.setDrawRange(0, Math.round(arc.progress * 50));
+
+          if (arc.progress >= 1.0) {
+            arc.targetCity.mesh.material.color.setHex(0x00f3ff);
+            arc.targetCity.mesh.material.opacity = 1.0;
+            if (arc.targetCity.domTag) arc.targetCity.domTag.classList.add('active');
+            arc.targetCity.label.classList.add('active');
+          }
+        });
+
+        // Projection labels 2D
+        cityObjects.forEach(obj => {
+          const worldPos = new THREE.Vector3();
+          obj.mesh.getWorldPosition(worldPos);
+          worldPos.project(camera);
+          obj.label.style.left = (worldPos.x * halfW + halfW) + 'px';
+          obj.label.style.top = (-worldPos.y * halfH + halfH) + 'px';
+        });
+
+        renderer.render(scene, camera);
+      }
+
+      // Démarre l'animation quand la section est visible
+      const mapObs = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) { animate(); mapObs.disconnect(); }
+      }, { threshold: 0.1 });
+      mapObs.observe(wrapper);
+
+      // Resize
+      window.addEventListener('resize', () => {
+        const nW = wrapper.clientWidth;
+        const nH = wrapper.clientHeight;
+        renderer.setSize(nW, nH);
+        camera.aspect = nW / nH;
+        camera.updateProjectionMatrix();
+      });
+    }
+
+
+    // ─── BACK TO TOP ───
+    const backToTop = document.getElementById('back-to-top');
+    if (backToTop) {
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+          backToTop.classList.add('visible');
+        } else {
+          backToTop.classList.remove('visible');
+        }
+      }, { passive: true });
+    }
+
+  </script>
+</body>
+
+</html>
