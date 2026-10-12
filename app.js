@@ -9,7 +9,6 @@
 
     // ─── EFFET COURT-CIRCUIT SUR TITRE ───
     function typewriterElectric(element) {
-      element.style.opacity = '1';
       element.style.animation = 'glitchReveal 1.2s ease-out forwards';
     }
 
@@ -163,16 +162,6 @@
         console.error("Erreur initElectricalGrid:", e);
       }
 
-      // Effet Typed Titre (léger délai)
-      setTimeout(() => {
-        try {
-          const titleEl = document.getElementById('hero-title');
-          if (titleEl) typewriterElectric(titleEl);
-        } catch (e) {
-          console.error("Erreur typewriterElectric:", e);
-        }
-      }, 500);
-
       // Init Eclair désactivé
 
       // ─── COMPTEUR 25 ANS & EFFET TILT ───
@@ -198,6 +187,11 @@
         const startCounter = () => {
           if (counterStarted || !counterEl) return;
           counterStarted = true;
+          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            if (textEl) textEl.classList.add('visible');
+            return;
+          }
+          counterEl.textContent = '0';
           let count = 0;
           const target = 25;
           const duration = 3500; // ms

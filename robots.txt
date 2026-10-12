@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://henry-fabien-electricien.vercel.app/sitemap.xml
