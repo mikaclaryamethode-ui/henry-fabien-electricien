@@ -1,462 +1,402 @@
-// ─── SCROLL REVEAL ───
-    const obs = new IntersectionObserver(
-      entries => entries.forEach(e => {
-        if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
-      }),
+(() => {
+  'use strict';
+
+  const PHONE_RAW = '+33625170665';
+  const STORAGE_KEY = 'hf_intervention_v2';
+  const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ─── 1. APPARITIONS AU DÉFILEMENT ───
+  const revealEls = document.querySelectorAll('.reveal');
+  if (REDUCED_MOTION || !('IntersectionObserver' in window)) {
+    revealEls.forEach((el) => el.classList.add('visible'));
+  } else {
+    const revealObs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            revealObs.unobserve(entry.target);
+          }
+        });
+      },
       { threshold: 0.12 }
     );
-    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+    revealEls.forEach((el) => revealObs.observe(el));
+  }
 
-    // ─── EFFET COURT-CIRCUIT SUR TITRE ───
-    function typewriterElectric(element) {
-      element.style.animation = 'glitchReveal 1.2s ease-out forwards';
+  // ─── 2. TABLEAU ÉLECTRIQUE INTERACTIF ───
+  const CIRCUITS = {
+    depannage: {
+      title: 'C1 — Dépannage & recherche de panne',
+      ref: 'Intervention rapide',
+      desc: "Disjoncteur qui saute, coupure partielle, prise qui chauffe ou tableau qui grésille : recherche précise du défaut et remise en sécurité propre.",
+      cta: 'Signaler une panne sur ce circuit',
+      mode: 'URGENCE',
+      status: 'Circuit C1 actif'
+    },
+    installation: {
+      title: 'C2 — Installation & appareillage',
+      ref: 'Neuf & remplacement',
+      desc: "Pose de tableaux électriques, prises dédiées, interrupteurs et éclairages intérieurs ou extérieurs, dimensionnés pour vos usages réels.",
+      cta: 'Demander un devis installation',
+      mode: 'DEVIS',
+      status: 'Circuit C2 actif'
+    },
+    normes: {
+      title: 'C3 — Mise aux normes NF C 15-100',
+      ref: 'Consuel, vente & location',
+      desc: "Protection différentielle 30 mA, mise à la terre, repérage complet et levée des anomalies relevées sur votre diagnostic électrique.",
+      cta: 'Planifier une mise aux normes',
+      mode: 'NORMES',
+      status: 'Circuit C3 actif'
+    },
+    renovation: {
+      title: 'C4 — Rénovation électrique complète',
+      ref: 'Maison, gîte & local pro',
+      desc: "Réfection totale d'une installation ancienne en Béarn : cheminement propre, tableau neuf étiqueté et conformité durable.",
+      cta: 'Parler de votre rénovation',
+      mode: 'DEVIS',
+      status: 'Circuit C4 actif'
     }
+  };
 
-    // ─── FOND THREE.JS RESEAU ELECTRIQUE ───
-    let heroScene, heroCamera, heroRenderer, heroParticles, heroLines, heroNodes = [];
-    let mouseVector = { x: 0, y: 0 }; // Plain object — THREE pas encore dispo ici (defer)
+  const breakerBtns = document.querySelectorAll('.breaker[data-circuit]');
+  const readoutTitle = document.getElementById('readout-title');
+  const readoutRef = document.getElementById('readout-ref');
+  const readoutDesc = document.getElementById('readout-desc');
+  const readoutCta = document.getElementById('readout-cta');
+  const panelStatus = document.getElementById('panel-status');
 
-    function initElectricalGrid() {
-      const hero = document.getElementById('hero-section');
-      if (!hero || typeof THREE === 'undefined') return;
+  function selectCircuit(key) {
+    const data = CIRCUITS[key];
+    if (!data) return;
+    breakerBtns.forEach((btn) => {
+      const active = btn.dataset.circuit === key;
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    if (readoutTitle) readoutTitle.textContent = data.title;
+    if (readoutRef) readoutRef.textContent = data.ref;
+    if (readoutDesc) readoutDesc.textContent = data.desc;
+    if (readoutCta) {
+      readoutCta.textContent = data.cta;
+      readoutCta.dataset.preset = data.mode;
+    }
+    if (panelStatus) panelStatus.textContent = data.status;
+  }
 
-      const canvas = document.createElement('canvas');
-      canvas.id = 'hero-particles';
-      canvas.style.position = 'absolute';
-      canvas.style.inset = '0';
-      canvas.style.top = '0';
-      canvas.style.zIndex = '0';
-      canvas.style.pointerEvents = 'none';
-      hero.insertBefore(canvas, hero.firstChild);
+  breakerBtns.forEach((btn) => {
+    btn.addEventListener('click', () => selectCircuit(btn.dataset.circuit));
+  });
 
-      heroScene = new THREE.Scene();
-      heroCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-      heroCamera.position.z = 150;
-
-      heroRenderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-      heroRenderer.setSize(window.innerWidth, hero.offsetHeight);
-      heroRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-      const particleCount = 80;
-      const geometry = new THREE.BufferGeometry();
-      const positions = new Float32Array(particleCount * 3);
-
-      for (let i = 0; i < particleCount; i++) {
-        // Position aléatoire sur les axes X, Y, dispersés sur -150 à +150
-        const x = (Math.random() - 0.5) * 400;
-        const y = (Math.random() - 0.5) * 300;
-        const z = (Math.random() - 0.5) * 100 - 50; // Profondeur
-
-        positions[i * 3] = x;
-        positions[i * 3 + 1] = y;
-        positions[i * 3 + 2] = z;
-
-        heroNodes.push({
-          baseX: x, baseY: y, baseZ: z,
-          current: new THREE.Vector3(x, y, z),
-          target: new THREE.Vector3(x, y, z),
-          vx: 0, vy: 0 // Vélocité pour le champ de force
-        });
+  if (readoutCta) {
+    readoutCta.addEventListener('click', () => {
+      const targetMode = readoutCta.dataset.preset;
+      if (!targetMode) return;
+      const radio = document.querySelector(`input[name="mode"][value="${targetMode}"]`);
+      if (radio) {
+        radio.checked = true;
+        updatePreview();
+        saveState();
       }
-      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    });
+  }
 
-      const pMaterial = new THREE.PointsMaterial({
-        color: 0x4e6a84,
-        size: 2.5,
-        transparent: true,
-        opacity: 0.6
-      });
+  // ─── 3. CARTE VECTORIELLE DU PIÉMONT BÉARNAIS ───
+  const CITIES = {
+    lanne: { label: 'Lanne-en-Barétous — Atelier de départ', meta: 'Base 64570', x: 170, y: 235 },
+    arette: { label: 'Arette — Vallée de Barétous', meta: 'Environ 5 min', x: 195, y: 262 },
+    oloron: { label: 'Oloron-Sainte-Marie — Piémont oloronais', meta: 'Environ 18 min', x: 245, y: 200 },
+    mauleon: { label: 'Mauléon-Licharre — Soule', meta: 'Environ 22 min', x: 88, y: 196 },
+    navarrenx: { label: 'Navarrenx — Béarn des Gaves', meta: 'Environ 25 min', x: 152, y: 132 },
+    pierre: { label: 'La Pierre Saint-Martin — Station & chalets', meta: 'Environ 30 min', x: 178, y: 322 },
+    arudy: { label: 'Arudy — Vallée d’Ossau', meta: 'Environ 32 min', x: 312, y: 238 },
+    mourenx: { label: 'Mourenx — Bassin de Lacq', meta: 'Environ 38 min', x: 248, y: 96 },
+    orthez: { label: 'Orthez — Secteur Nord Béarn', meta: 'Environ 42 min', x: 188, y: 54 },
+    pau: { label: 'Pau — Agglomération paloise', meta: 'Environ 48 min', x: 376, y: 138 }
+  };
 
-      heroParticles = new THREE.Points(geometry, pMaterial);
-      heroScene.add(heroParticles);
+  const communeBtns = document.querySelectorAll('.commune-btn[data-city]');
+  const mapNodes = document.querySelectorAll('.map-node[data-node]');
+  const mapActiveLine = document.getElementById('map-active-line');
+  const mapActiveLabel = document.getElementById('map-active-label');
+  const mapActiveMeta = document.getElementById('map-active-meta');
 
-      // Lignes de connexion
-      const lineMat = new THREE.LineBasicMaterial({
-        color: 0xF5A623,
-        transparent: true,
-        opacity: 0.15
-      });
-      heroLines = new THREE.LineSegments(new THREE.BufferGeometry(), lineMat);
-      heroScene.add(heroLines);
+  function selectCity(key) {
+    const city = CITIES[key];
+    if (!city) return;
 
-      animateElectricalGrid();
+    communeBtns.forEach((btn) => {
+      btn.classList.toggle('is-active', btn.dataset.city === key);
+    });
+    mapNodes.forEach((node) => {
+      node.classList.toggle('is-active', node.dataset.node === key);
+    });
+
+    if (mapActiveLine) {
+      mapActiveLine.setAttribute('x2', String(city.x));
+      mapActiveLine.setAttribute('y2', String(city.y));
     }
+    if (mapActiveLabel) mapActiveLabel.textContent = city.label;
+    if (mapActiveMeta) mapActiveMeta.textContent = city.meta;
+  }
 
-    let scrollYOffset = 0;
+  communeBtns.forEach((btn) => {
+    btn.addEventListener('click', () => selectCity(btn.dataset.city));
+  });
 
-    function animateElectricalGrid() {
-      requestAnimationFrame(animateElectricalGrid);
+  mapNodes.forEach((node) => {
+    node.addEventListener('click', () => selectCity(node.dataset.node));
+    node.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        selectCity(node.dataset.node);
+      }
+    });
+  });
 
-      const positions = heroParticles.geometry.attributes.position.array;
-      const linesPositions = [];
-      const linesColors = [];
+  // ─── 4. PARCOURS TERRAIN : DEMANDE D'INTERVENTION ───
+  const form = document.getElementById('intervention-form');
+  const nameInput = document.getElementById('client-name');
+  const phoneInput = document.getElementById('client-phone');
+  const citySelect = document.getElementById('client-city');
+  const slotSelect = document.getElementById('client-slot');
+  const slotDetailWrap = document.getElementById('precise-slot-wrap');
+  const slotDetailInput = document.getElementById('client-slot-detail');
+  const addressInput = document.getElementById('client-address');
+  const accessInput = document.getElementById('client-access');
+  const noteInput = document.getElementById('client-note');
+  const errorBox = document.getElementById('form-error');
+  const previewText = document.getElementById('preview-text');
+  const deviceHint = document.getElementById('device-hint');
+  const btnSms = document.getElementById('btn-sms');
+  const btnCopy = document.getElementById('btn-copy');
+  const feedbackBox = document.getElementById('form-feedback');
+  const feedbackMessage = document.getElementById('feedback-message');
+  const btnReset = document.getElementById('btn-reset');
 
-      // Update des positions (interaction souris + décharge au scroll)
-      for (let i = 0; i < heroNodes.length; i++) {
-        const node = heroNodes[i];
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768;
 
-        // Mouvement de base lent (flottement)
-        const time = Date.now() * 0.0005;
-        node.target.x = node.baseX + Math.sin(time + i) * 10;
-        node.target.y = node.baseY + Math.cos(time + i * 1.5) * 10 - scrollYOffset * 0.5; // Discharge vers le bas au scroll
+  if (deviceHint && btnSms) {
+    if (isMobile) {
+      deviceHint.textContent = "Sur téléphone : le bouton ouvre votre application SMS avec le message prêt à envoyer.";
+      btnSms.textContent = 'Envoyer par SMS à Fabien';
+    } else {
+      deviceHint.textContent = "Sur ordinateur : copiez la demande ou appelez directement le 06 25 17 06 65 (les liens SMS ne s'ouvrent pas sur tous les PC).";
+      btnSms.textContent = 'Ouvrir SMS (si configuré)';
+    }
+  }
 
-        // Interaction souris : force répulsive
-        if (mouseVector.x !== 0 && mouseVector.y !== 0) {
-          const dx = node.current.x - mouseVector.x;
-          const dy = node.current.y - mouseVector.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 60) {
-            const force = (60 - dist) / 60;
-            node.target.x += (dx / dist) * force * 30;
-            node.target.y += (dy / dist) * force * 30;
-          }
-        }
+  function toAsciiGsm(str) {
+    return str
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[’‘]/g, "'")
+      .replace(/[—–]/g, '-')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
 
-        // Interpolation douce
-        node.current.x += (node.target.x - node.current.x) * 0.02;
-        node.current.y += (node.target.y - node.current.y) * 0.02;
+  function getSelectedMode() {
+    const checked = form ? form.querySelector('input[name="mode"]:checked') : null;
+    return checked ? checked.value : 'URGENCE';
+  }
 
-        positions[i * 3] = node.current.x;
-        positions[i * 3 + 1] = node.current.y;
-        positions[i * 3 + 2] = node.current.z;
+  function buildMessage() {
+    const mode = getSelectedMode();
+    const name = toAsciiGsm(nameInput.value);
+    const phone = toAsciiGsm(phoneInput.value);
+    const city = toAsciiGsm(citySelect.value);
+    const slotBase = slotSelect.value;
+    const slot =
+      slotBase === 'Creneau precis' && slotDetailInput.value.trim()
+        ? toAsciiGsm(slotDetailInput.value)
+        : toAsciiGsm(slotBase);
+    const address = toAsciiGsm(addressInput.value);
+    const access = toAsciiGsm(accessInput.value);
+    const note = toAsciiGsm(noteInput.value);
 
-        // Lignes de connexion
-        for (let j = i + 1; j < heroNodes.length; j++) {
-          const node2 = heroNodes[j];
-          const dx = node.current.x - node2.current.x;
-          const dy = node.current.y - node2.current.y;
-          const dz = node.current.z - node2.current.z;
-          const distSq = dx * dx + dy * dy + dz * dz;
+    const lines = [
+      `[${mode}] ${name || 'Nom a preciser'} - ${city || 'Commune'} - ${slot}`,
+      `Tel : ${phone || 'a preciser'}`,
+      `Adresse : ${address || 'a preciser'}${access ? ' (' + access + ')' : ''}`
+    ];
 
-          const maxDist = 3000;
-          if (distSq < maxDist) {
-            linesPositions.push(
-              node.current.x, node.current.y, node.current.z,
-              node2.current.x, node2.current.y, node2.current.z
+    if (note) {
+      lines.push(`Detail : ${note}`);
+    }
+    return lines.join('\n');
+  }
+
+  function updatePreview() {
+    if (!previewText) return;
+    if (slotDetailWrap) {
+      slotDetailWrap.classList.toggle('is-hidden', slotSelect.value !== 'Creneau precis');
+    }
+    previewText.textContent = buildMessage();
+  }
+
+  function clearError() {
+    if (!errorBox) return;
+    errorBox.textContent = '';
+    errorBox.classList.remove('is-visible');
+  }
+
+  function showError(msg, focusEl) {
+    if (errorBox) {
+      errorBox.textContent = msg;
+      errorBox.classList.add('is-visible');
+    }
+    if (focusEl && typeof focusEl.focus === 'function') {
+      focusEl.focus();
+    }
+  }
+
+  function validateForm() {
+    clearError();
+    if (!nameInput.value.trim()) {
+      showError('Merci d’indiquer votre prénom et nom afin que Fabien sache qui rappeler.', nameInput);
+      return false;
+    }
+    if (!phoneInput.value.trim() || phoneInput.value.replace(/\D/g, '').length < 10) {
+      showError('Merci d’indiquer un numéro de téléphone valide (10 chiffres) pour le rappel.', phoneInput);
+      return false;
+    }
+    if (!citySelect.value) {
+      showError('Merci de choisir la commune d’intervention dans la liste.', citySelect);
+      return false;
+    }
+    if (slotSelect.value === 'Creneau precis' && !slotDetailInput.value.trim()) {
+      showError('Merci de préciser la date ou le créneau souhaité.', slotDetailInput);
+      return false;
+    }
+    if (!addressInput.value.trim()) {
+      showError('Merci d’indiquer la rue et le numéro pour préparer l’intervention.', addressInput);
+      return false;
+    }
+    return true;
+  }
+
+  function showFeedback(text) {
+    if (!feedbackBox || !feedbackMessage) return;
+    feedbackMessage.textContent = text;
+    feedbackBox.classList.remove('is-hidden');
+  }
+
+  function saveState() {
+    if (!form) return;
+    try {
+      const payload = {
+        mode: getSelectedMode(),
+        name: nameInput.value,
+        phone: phoneInput.value,
+        city: citySelect.value,
+        slot: slotSelect.value,
+        slotDetail: slotDetailInput.value,
+        address: addressInput.value,
+        access: accessInput.value,
+        note: noteInput.value
+      };
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    } catch (_e) {
+      // sessionStorage indisponible en navigation privée stricte
+    }
+  }
+
+  function restoreState() {
+    if (!form) return;
+    try {
+      const raw = sessionStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      if (data.mode) {
+        const radio = form.querySelector(`input[name="mode"][value="${data.mode}"]`);
+        if (radio) radio.checked = true;
+      }
+      if (typeof data.name === 'string') nameInput.value = data.name;
+      if (typeof data.phone === 'string') phoneInput.value = data.phone;
+      if (typeof data.city === 'string') citySelect.value = data.city;
+      if (typeof data.slot === 'string') slotSelect.value = data.slot;
+      if (typeof data.slotDetail === 'string') slotDetailInput.value = data.slotDetail;
+      if (typeof data.address === 'string') addressInput.value = data.address;
+      if (typeof data.access === 'string') accessInput.value = data.access;
+      if (typeof data.note === 'string') noteInput.value = data.note;
+    } catch (_e) {
+      // Ignore un état corrompu
+    }
+  }
+
+  if (form) {
+    restoreState();
+    updatePreview();
+
+    form.addEventListener('input', () => {
+      clearError();
+      updatePreview();
+      saveState();
+    });
+
+    form.addEventListener('change', () => {
+      clearError();
+      updatePreview();
+      saveState();
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!validateForm()) return;
+      const body = encodeURIComponent(buildMessage());
+      const separator = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? '&' : '?';
+      window.location.href = `sms:${PHONE_RAW}${separator}body=${body}`;
+      showFeedback(
+        'Votre application SMS a été ouverte. L’intervention est confirmée uniquement après réponse ou rappel de Fabien.'
+      );
+    });
+
+    if (btnCopy) {
+      btnCopy.addEventListener('click', async () => {
+        if (!validateForm()) return;
+        const text = buildMessage();
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(text);
+            showFeedback(
+              'Demande copiée. Envoyez-la par SMS au 06 25 17 06 65 ou par email. Confirmation après rappel de Fabien.'
             );
-          }
-        }
-      }
-
-      heroParticles.geometry.attributes.position.needsUpdate = true;
-      heroLines.geometry.setAttribute('position', new THREE.Float32BufferAttribute(linesPositions, 3));
-      heroLines.material.opacity = Math.max(0, 0.15 - (scrollYOffset * 0.0005));
-      heroParticles.material.opacity = Math.max(0, 0.6 - (scrollYOffset * 0.001));
-
-      heroRenderer.render(heroScene, heroCamera);
-    }
-
-    // ─── INIT SYSTEMES HERO ET CARTE ───
-    window.addEventListener('load', () => {
-      // Démarrage Map
-      try {
-        initHoloMap();
-      } catch (e) {
-        console.error("Erreur initHoloMap:", e);
-      }
-
-      // Init Particles
-      try {
-        initElectricalGrid();
-      } catch (e) {
-        console.error("Erreur initElectricalGrid:", e);
-      }
-
-      // Init Eclair désactivé
-
-      // ─── COMPTEUR 25 ANS & EFFET TILT ───
-      try {
-        const tiltEl = document.querySelector('.badge-tilt');
-        const counterEl = document.getElementById('experience-counter');
-        const textEl = document.getElementById('experience-text');
-
-        if (tiltEl && typeof VanillaTilt !== 'undefined') {
-          // Initialiser Vanilla-Tilt
-          VanillaTilt.init(tiltEl, {
-            max: 12,
-            speed: 600,
-            glare: true,
-            'max-glare': 0.12,
-            perspective: 1000,
-            scale: 1.03,
-            gyroscope: true
-          });
-        }
-
-        let counterStarted = false;
-        const startCounter = () => {
-          if (counterStarted || !counterEl) return;
-          counterStarted = true;
-          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            if (textEl) textEl.classList.add('visible');
-            return;
-          }
-          counterEl.textContent = '0';
-          let count = 0;
-          const target = 25;
-          const duration = 3500; // ms
-          const incrementTime = Math.floor(duration / target);
-
-          const timer = setInterval(() => {
-            count++;
-            if (counterEl) counterEl.textContent = count;
-            if (count >= target) {
-              clearInterval(timer);
-              if (textEl) textEl.classList.add('visible');
-            }
-          }, incrementTime);
-        };
-
-        const counterObserver = new IntersectionObserver((entries) => {
-          if (entries[0].isIntersecting) {
-            startCounter();
-            counterObserver.disconnect();
-          }
-        }, { threshold: 0.5 });
-
-        if (tiltEl) {
-          counterObserver.observe(tiltEl);
-        }
-      } catch (e) {
-        console.error("Erreur Compteur/Tilt:", e);
-      }
-    });
-
-    // ─── GLOW SOURIS HERO ET CARTES SERVICES ───
-    const heroSection = document.getElementById('hero-section');
-    const heroGlow = document.getElementById('hero-glow');
-    if (heroSection && heroGlow) {
-      heroSection.addEventListener('mousemove', (e) => {
-        const rect = heroSection.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        heroGlow.style.left = x + 'px';
-        heroGlow.style.top = y + 'px';
-
-        // Mettre à jour la position souris pour ThreeJS particles
-        // Transformation canvas coordinates to world coordinates (-X to X, Y to -Y)
-        if (typeof heroCamera !== 'undefined') {
-          // On fait une approximation simple pour que les points réagissent au curseur 2D
-          mouseVector.x = (x - rect.width / 2) * 0.3;
-          mouseVector.y = -(y - rect.height / 2) * 0.3;
-        }
-      });
-      // Sortie du curseur
-      heroSection.addEventListener('mouseleave', () => {
-        mouseVector.x = 0;
-        mouseVector.y = 0;
-      });
-    }
-
-    // ─── SCROLL DISCHARGE CAPTURE ───
-    window.addEventListener('scroll', () => {
-      scrollYOffset = window.scrollY;
-    }, { passive: true });
-
-    // Effet Spotlight sur les cartes de service
-    document.querySelectorAll('.service-card').forEach(card => {
-      card.addEventListener('mousemove', e => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        card.style.setProperty('--mouse-x', `${x}px`);
-        card.style.setProperty('--mouse-y', `${y}px`);
-      });
-    });
-
-    // ─── CARTE 3D THREE.JS ───
-    function initHoloMap() {
-      const wrapper = document.getElementById('holo-map-container');
-      const canvasWrapper = document.getElementById('holo-canvas');
-      const labelWrapper = document.getElementById('holo-labels');
-      if (!wrapper || !canvasWrapper || typeof THREE === 'undefined') return;
-
-      // On lit les dimensions après que le DOM est visible
-      const W = wrapper.clientWidth || 380;
-      const H = wrapper.clientHeight || 380;
-
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 1000);
-      camera.position.set(0, 10, 14);
-      camera.lookAt(0, 0, 0);
-
-      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-      renderer.setSize(W, H);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.domElement.style.display = 'block'; // évite pixel fantôme
-      canvasWrapper.appendChild(renderer.domElement);
-
-      const mapGroup = new THREE.Group();
-      scene.add(mapGroup);
-
-      // GridHelper r128 : material est un tableau [centerMat, gridMat]
-      const grid = new THREE.GridHelper(16, 16, 0x00f3ff, 0x4e6a84);
-      [].concat(grid.material).forEach(m => { m.transparent = true; m.opacity = 0.12; });
-      mapGroup.add(grid);
-
-      // Cercles concentriques manuels pour l'effet radar
-      for (let r = 2; r <= 8; r += 2) {
-        const pts = [];
-        for (let i = 0; i <= 64; i++) {
-          const a = (i / 64) * Math.PI * 2;
-          pts.push(new THREE.Vector3(Math.cos(a) * r, 0, Math.sin(a) * r));
-        }
-        const geo = new THREE.BufferGeometry().setFromPoints(pts);
-        const mat = new THREE.LineBasicMaterial({ color: 0x00f3ff, transparent: true, opacity: 0.08 });
-        mapGroup.add(new THREE.Line(geo, mat));
-      }
-
-      const cities = [
-        { name: 'Lanne-en-Barétous', pos: new THREE.Vector3(-3, 0, 3),    isCenter: true, tagId: 'tag-lanne' },
-        { name: 'Mauléon',           pos: new THREE.Vector3(-5, 0, 1.5),   delay: 0.5,  tagId: 'tag-mauleon' },
-        { name: 'Oloron',            pos: new THREE.Vector3(-0.5, 0, 1.5), delay: 1.2,  tagId: 'tag-oloron' },
-        { name: 'Arette',            pos: new THREE.Vector3(-2.0, 0, 6.0), delay: 1.9,  tagId: 'tag-arette' },
-        { name: 'Navarrenx',         pos: new THREE.Vector3(-2.5, 0, -1),  delay: 2.6,  tagId: 'tag-navarrenx' },
-        { name: 'La Pierre St-M.',   pos: new THREE.Vector3(-1.5, 0, 7.8), delay: 3.3,  tagId: 'tag-lapierresm' },
-        { name: 'Arudy',             pos: new THREE.Vector3(1.8, 0, 0.5),  delay: 4.0,  tagId: 'tag-arudy' },
-        { name: 'Mourenx',           pos: new THREE.Vector3(1.5, 0, -3.0), delay: 4.7,  tagId: 'tag-mourenx' },
-        { name: 'Orthez',            pos: new THREE.Vector3(-1, 0, -4.5),  delay: 5.4,  tagId: 'tag-orthez' },
-        { name: 'Pau',               pos: new THREE.Vector3(4, 0, -2),     delay: 6.1,  tagId: 'tag-pau' }
-      ];
-
-      const cityObjects = [];
-      const arcs = [];
-      const centerPos = cities[0].pos;
-
-      cities.forEach(city => {
-        const geo = new THREE.SphereGeometry(city.isCenter ? 0.28 : 0.14, 16, 16);
-        const mat = new THREE.MeshBasicMaterial({
-          color: city.isCenter ? 0xF5A623 : 0x4e6a84,
-          transparent: !city.isCenter,
-          opacity: city.isCenter ? 1 : 0.5
-        });
-        const mesh = new THREE.Mesh(geo, mat);
-        mesh.position.copy(city.pos);
-        mapGroup.add(mesh);
-
-        // Halo pour la ville centre — couleur orange, amplitude réduite
-        if (city.isCenter) {
-          const haloGeo = new THREE.SphereGeometry(0.42, 24, 24);
-          const haloMat = new THREE.MeshBasicMaterial({ color: 0xF5A623, transparent: true, opacity: 0.20, blending: THREE.AdditiveBlending });
-          mesh.add(new THREE.Mesh(haloGeo, haloMat));
-        }
-
-        // Label DOM
-        const label = document.createElement('div');
-        label.className = 'city-label' + (city.isCenter ? ' center-city' : '');
-        label.textContent = city.name;
-        labelWrapper.appendChild(label);
-
-        const domTag = document.getElementById(city.tagId);
-        cityObjects.push({ data: city, mesh, label, domTag });
-
-        // Arc vers les villes secondaires
-        if (!city.isCenter) {
-          const mid = new THREE.Vector3(
-            (centerPos.x + city.pos.x) / 2,
-            centerPos.distanceTo(city.pos) * 0.38,
-            (centerPos.z + city.pos.z) / 2
-          );
-          const curve = new THREE.QuadraticBezierCurve3(centerPos, mid, city.pos);
-          const points = curve.getPoints(50);
-          const arcGeo = new THREE.BufferGeometry().setFromPoints(points);
-          arcGeo.setDrawRange(0, 0);
-          const arcMat = new THREE.LineBasicMaterial({
-            color: 0xF5A623, transparent: true, opacity: 0.75,
-            blending: THREE.AdditiveBlending
-          });
-          const line = new THREE.Line(arcGeo, arcMat);
-          mapGroup.add(line);
-          arcs.push({ line, arcGeo, targetCity: cityObjects[cityObjects.length - 1], delay: city.delay, progress: 0 });
-        }
-      });
-
-      const clock = new THREE.Clock();
-      const loopDuration = 9.0;
-
-      function animate() {
-        requestAnimationFrame(animate);
-        const time = clock.getElapsedTime();
-        const cycleTime = time % loopDuration;
-        const halfW = wrapper.clientWidth / 2;
-        const halfH = wrapper.clientHeight / 2;
-
-        // Rotation lente
-        mapGroup.rotation.y = time * 0.12;
-        mapGroup.rotation.x = Math.sin(time * 0.5) * 0.05;
-        mapGroup.rotation.z = Math.cos(time * 0.3) * 0.05;
-
-        // Pulsation ville centre
-        const pulse = 1 + Math.sin(time * 4) * 0.08;
-        cityObjects[0].mesh.scale.setScalar(pulse);
-
-        // Tag Lanne allumé dès le début du cycle, éteint à la fin
-        const isActivePhase = cycleTime < loopDuration - 0.4;
-        const centerTag = cityObjects[0].domTag;
-        if (centerTag) {
-          centerTag.classList.toggle('active', isActivePhase);
-        }
-
-        // Progression des arcs et synchronisation des étiquettes
-        arcs.forEach(arc => {
-          if (isActivePhase && cycleTime > arc.delay) {
-            arc.progress = Math.min((cycleTime - arc.delay) * 2.2, 1.0);
           } else {
-            // Réinitialisation en fin de cycle ou avant le délai de départ
-            arc.progress = 0;
-            arc.targetCity.mesh.material.color.setHex(0x4e6a84);
-            arc.targetCity.mesh.material.opacity = 0.5;
-            if (arc.targetCity.domTag) arc.targetCity.domTag.classList.remove('active');
-            arc.targetCity.label.classList.remove('active');
+            showFeedback('Copie manuelle : sélectionnez le texte dans l’aperçu ci-dessus et envoyez-le au 06 25 17 06 65.');
           }
-
-          arc.arcGeo.setDrawRange(0, Math.round(arc.progress * 50));
-
-          if (arc.progress >= 1.0) {
-            arc.targetCity.mesh.material.color.setHex(0x00f3ff);
-            arc.targetCity.mesh.material.opacity = 1.0;
-            if (arc.targetCity.domTag) arc.targetCity.domTag.classList.add('active');
-            arc.targetCity.label.classList.add('active');
-          }
-        });
-
-        // Projection labels 2D
-        cityObjects.forEach(obj => {
-          const worldPos = new THREE.Vector3();
-          obj.mesh.getWorldPosition(worldPos);
-          worldPos.project(camera);
-          obj.label.style.left = (worldPos.x * halfW + halfW) + 'px';
-          obj.label.style.top = (-worldPos.y * halfH + halfH) + 'px';
-        });
-
-        renderer.render(scene, camera);
-      }
-
-      // Démarre l'animation quand la section est visible
-      const mapObs = new IntersectionObserver(entries => {
-        if (entries[0].isIntersecting) { animate(); mapObs.disconnect(); }
-      }, { threshold: 0.1 });
-      mapObs.observe(wrapper);
-
-      // Resize
-      window.addEventListener('resize', () => {
-        const nW = wrapper.clientWidth;
-        const nH = wrapper.clientHeight;
-        renderer.setSize(nW, nH);
-        camera.aspect = nW / nH;
-        camera.updateProjectionMatrix();
+        } catch (_e) {
+          showFeedback('Copie manuelle : sélectionnez le texte dans l’aperçu ci-dessus et envoyez-le au 06 25 17 06 65.');
+        }
       });
     }
 
-
-    // ─── BACK TO TOP ───
-    const backToTop = document.getElementById('back-to-top');
-    if (backToTop) {
-      window.addEventListener('scroll', () => {
-        if (window.scrollY > 300) {
-          backToTop.classList.add('visible');
-        } else {
-          backToTop.classList.remove('visible');
+    if (btnReset) {
+      btnReset.addEventListener('click', () => {
+        form.reset();
+        clearError();
+        if (feedbackBox) feedbackBox.classList.add('is-hidden');
+        try {
+          sessionStorage.removeItem(STORAGE_KEY);
+        } catch (_e) {
+          // ignore
         }
-      }, { passive: true });
+        updatePreview();
+        nameInput.focus();
+      });
     }
+  }
+
+  // ─── 5. RETOUR EN HAUT ───
+  const backToTop = document.getElementById('back-to-top');
+  if (backToTop) {
+    window.addEventListener(
+      'scroll',
+      () => {
+        backToTop.classList.toggle('visible', window.scrollY > 320);
+      },
+      { passive: true }
+    );
+  }
+})();
