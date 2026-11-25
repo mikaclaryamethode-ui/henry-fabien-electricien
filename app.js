@@ -1,8 +1,6 @@
 (() => {
   'use strict';
 
-  const PHONE_RAW = '+33625170665';
-  const STORAGE_KEY = 'hf_intervention_v2';
   const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ─── 1. APPARITIONS AU DÉFILEMENT ───
@@ -19,376 +17,246 @@
           }
         });
       },
-      { threshold: 0.12 }
+      { threshold: 0.1 }
     );
     revealEls.forEach((el) => revealObs.observe(el));
   }
 
-  // ─── 2. TABLEAU ÉLECTRIQUE INTERACTIF ───
-  const CIRCUITS = {
-    depannage: {
-      title: 'C1 — Dépannage & recherche de panne',
-      ref: 'Intervention rapide',
-      desc: "Disjoncteur qui saute, coupure partielle, prise qui chauffe ou tableau qui grésille : recherche précise du défaut et remise en sécurité propre.",
-      cta: 'Signaler une panne sur ce circuit',
-      mode: 'URGENCE',
-      status: 'Circuit C1 actif'
-    },
-    installation: {
-      title: 'C2 — Installation & appareillage',
-      ref: 'Neuf & remplacement',
-      desc: "Pose de tableaux électriques, prises dédiées, interrupteurs et éclairages intérieurs ou extérieurs, dimensionnés pour vos usages réels.",
-      cta: 'Demander un devis installation',
-      mode: 'DEVIS',
-      status: 'Circuit C2 actif'
-    },
-    normes: {
-      title: 'C3 — Mise aux normes NF C 15-100',
-      ref: 'Consuel, vente & location',
-      desc: "Protection différentielle 30 mA, mise à la terre, repérage complet et levée des anomalies relevées sur votre diagnostic électrique.",
-      cta: 'Planifier une mise aux normes',
-      mode: 'NORMES',
-      status: 'Circuit C3 actif'
-    },
-    renovation: {
-      title: 'C4 — Rénovation électrique complète',
-      ref: 'Maison, gîte & local pro',
-      desc: "Réfection totale d'une installation ancienne en Béarn : cheminement propre, tableau neuf étiqueté et conformité durable.",
-      cta: 'Parler de votre rénovation',
-      mode: 'DEVIS',
-      status: 'Circuit C4 actif'
-    }
-  };
+  // ─── 2. RADAR 3D DE LA ZONE D'INTERVENTION (THREE.JS) ───
+  function initHoloMap() {
+    const wrapper = document.getElementById('holo-map-container');
+    const canvasWrapper = document.getElementById('holo-canvas');
+    const labelWrapper = document.getElementById('holo-labels');
+    const toggleBtn = document.getElementById('radar-toggle');
+    if (!wrapper || !canvasWrapper || typeof THREE === 'undefined') return;
 
-  const breakerBtns = document.querySelectorAll('.breaker[data-circuit]');
-  const readoutTitle = document.getElementById('readout-title');
-  const readoutRef = document.getElementById('readout-ref');
-  const readoutDesc = document.getElementById('readout-desc');
-  const readoutCta = document.getElementById('readout-cta');
-  const panelStatus = document.getElementById('panel-status');
+    const W = wrapper.clientWidth || 380;
+    const H = wrapper.clientHeight || 380;
 
-  function selectCircuit(key) {
-    const data = CIRCUITS[key];
-    if (!data) return;
-    breakerBtns.forEach((btn) => {
-      const active = btn.dataset.circuit === key;
-      btn.classList.toggle('is-active', active);
-      btn.setAttribute('aria-selected', active ? 'true' : 'false');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 1000);
+    camera.position.set(0, 10, 14);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(W, H);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.domElement.style.display = 'block';
+    canvasWrapper.appendChild(renderer.domElement);
+
+    const mapGroup = new THREE.Group();
+    scene.add(mapGroup);
+
+    const grid = new THREE.GridHelper(16, 16, 0x58c7e8, 0x4e6a84);
+    [].concat(grid.material).forEach((m) => {
+      m.transparent = true;
+      m.opacity = 0.14;
     });
-    if (readoutTitle) readoutTitle.textContent = data.title;
-    if (readoutRef) readoutRef.textContent = data.ref;
-    if (readoutDesc) readoutDesc.textContent = data.desc;
-    if (readoutCta) {
-      readoutCta.textContent = data.cta;
-      readoutCta.dataset.preset = data.mode;
-    }
-    if (panelStatus) panelStatus.textContent = data.status;
-  }
+    mapGroup.add(grid);
 
-  breakerBtns.forEach((btn) => {
-    btn.addEventListener('click', () => selectCircuit(btn.dataset.circuit));
-  });
-
-  if (readoutCta) {
-    readoutCta.addEventListener('click', () => {
-      const targetMode = readoutCta.dataset.preset;
-      if (!targetMode) return;
-      const radio = document.querySelector(`input[name="mode"][value="${targetMode}"]`);
-      if (radio) {
-        radio.checked = true;
-        updatePreview();
-        saveState();
+    for (let r = 2; r <= 8; r += 2) {
+      const pts = [];
+      for (let i = 0; i <= 64; i++) {
+        const a = (i / 64) * Math.PI * 2;
+        pts.push(new THREE.Vector3(Math.cos(a) * r, 0, Math.sin(a) * r));
       }
-    });
-  }
-
-  // ─── 3. CARTE VECTORIELLE DU PIÉMONT BÉARNAIS ───
-  const CITIES = {
-    lanne: { label: 'Lanne-en-Barétous — Atelier de départ', meta: 'Base 64570', x: 170, y: 235 },
-    arette: { label: 'Arette — Vallée de Barétous', meta: 'Environ 5 min', x: 195, y: 262 },
-    oloron: { label: 'Oloron-Sainte-Marie — Piémont oloronais', meta: 'Environ 18 min', x: 245, y: 200 },
-    mauleon: { label: 'Mauléon-Licharre — Soule', meta: 'Environ 22 min', x: 88, y: 196 },
-    navarrenx: { label: 'Navarrenx — Béarn des Gaves', meta: 'Environ 25 min', x: 152, y: 132 },
-    pierre: { label: 'La Pierre Saint-Martin — Station & chalets', meta: 'Environ 30 min', x: 178, y: 322 },
-    arudy: { label: 'Arudy — Vallée d’Ossau', meta: 'Environ 32 min', x: 312, y: 238 },
-    mourenx: { label: 'Mourenx — Bassin de Lacq', meta: 'Environ 38 min', x: 248, y: 96 },
-    orthez: { label: 'Orthez — Secteur Nord Béarn', meta: 'Environ 42 min', x: 188, y: 54 },
-    pau: { label: 'Pau — Agglomération paloise', meta: 'Environ 48 min', x: 376, y: 138 }
-  };
-
-  const communeBtns = document.querySelectorAll('.commune-btn[data-city]');
-  const mapNodes = document.querySelectorAll('.map-node[data-node]');
-  const mapActiveLine = document.getElementById('map-active-line');
-  const mapActiveLabel = document.getElementById('map-active-label');
-  const mapActiveMeta = document.getElementById('map-active-meta');
-
-  function selectCity(key) {
-    const city = CITIES[key];
-    if (!city) return;
-
-    communeBtns.forEach((btn) => {
-      btn.classList.toggle('is-active', btn.dataset.city === key);
-    });
-    mapNodes.forEach((node) => {
-      node.classList.toggle('is-active', node.dataset.node === key);
-    });
-
-    if (mapActiveLine) {
-      mapActiveLine.setAttribute('x2', String(city.x));
-      mapActiveLine.setAttribute('y2', String(city.y));
+      const geo = new THREE.BufferGeometry().setFromPoints(pts);
+      const mat = new THREE.LineBasicMaterial({ color: 0x58c7e8, transparent: true, opacity: 0.12 });
+      mapGroup.add(new THREE.Line(geo, mat));
     }
-    if (mapActiveLabel) mapActiveLabel.textContent = city.label;
-    if (mapActiveMeta) mapActiveMeta.textContent = city.meta;
-  }
 
-  communeBtns.forEach((btn) => {
-    btn.addEventListener('click', () => selectCity(btn.dataset.city));
-  });
-
-  mapNodes.forEach((node) => {
-    node.addEventListener('click', () => selectCity(node.dataset.node));
-    node.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        selectCity(node.dataset.node);
-      }
-    });
-  });
-
-  // ─── 4. PARCOURS TERRAIN : DEMANDE D'INTERVENTION ───
-  const form = document.getElementById('intervention-form');
-  const nameInput = document.getElementById('client-name');
-  const phoneInput = document.getElementById('client-phone');
-  const citySelect = document.getElementById('client-city');
-  const slotSelect = document.getElementById('client-slot');
-  const slotDetailWrap = document.getElementById('precise-slot-wrap');
-  const slotDetailInput = document.getElementById('client-slot-detail');
-  const addressInput = document.getElementById('client-address');
-  const accessInput = document.getElementById('client-access');
-  const noteInput = document.getElementById('client-note');
-  const errorBox = document.getElementById('form-error');
-  const previewText = document.getElementById('preview-text');
-  const deviceHint = document.getElementById('device-hint');
-  const btnSms = document.getElementById('btn-sms');
-  const btnCopy = document.getElementById('btn-copy');
-  const feedbackBox = document.getElementById('form-feedback');
-  const feedbackMessage = document.getElementById('feedback-message');
-  const btnReset = document.getElementById('btn-reset');
-
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768;
-
-  if (deviceHint && btnSms) {
-    if (isMobile) {
-      deviceHint.textContent = "Sur téléphone : le bouton ouvre votre application SMS avec le message prêt à envoyer.";
-      btnSms.textContent = 'Envoyer par SMS à Fabien';
-    } else {
-      deviceHint.textContent = "Sur ordinateur : copiez la demande ou appelez directement le 06 25 17 06 65 (les liens SMS ne s'ouvrent pas sur tous les PC).";
-      btnSms.textContent = 'Ouvrir SMS (si configuré)';
-    }
-  }
-
-  function toAsciiGsm(str) {
-    return str
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[’‘]/g, "'")
-      .replace(/[—–]/g, '-')
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
-
-  function getSelectedMode() {
-    const checked = form ? form.querySelector('input[name="mode"]:checked') : null;
-    return checked ? checked.value : 'URGENCE';
-  }
-
-  function buildMessage() {
-    const mode = getSelectedMode();
-    const name = toAsciiGsm(nameInput.value);
-    const phone = toAsciiGsm(phoneInput.value);
-    const city = toAsciiGsm(citySelect.value);
-    const slotBase = slotSelect.value;
-    const slot =
-      slotBase === 'Creneau precis' && slotDetailInput.value.trim()
-        ? toAsciiGsm(slotDetailInput.value)
-        : toAsciiGsm(slotBase);
-    const address = toAsciiGsm(addressInput.value);
-    const access = toAsciiGsm(accessInput.value);
-    const note = toAsciiGsm(noteInput.value);
-
-    const lines = [
-      `[${mode}] ${name || 'Nom a preciser'} - ${city || 'Commune'} - ${slot}`,
-      `Tel : ${phone || 'a preciser'}`,
-      `Adresse : ${address || 'a preciser'}${access ? ' (' + access + ')' : ''}`
+    const cities = [
+      { name: 'Lanne-en-Barétous', pos: new THREE.Vector3(-3, 0, 3), isCenter: true, domId: 'city-lanne' },
+      { name: 'Mauléon', pos: new THREE.Vector3(-5, 0, 1.5), delay: 0.5, domId: 'city-mauleon' },
+      { name: 'Oloron', pos: new THREE.Vector3(-0.5, 0, 1.5), delay: 1.2, domId: 'city-oloron' },
+      { name: 'Arette', pos: new THREE.Vector3(-2.0, 0, 6.0), delay: 1.9, domId: 'city-arette' },
+      { name: 'Navarrenx', pos: new THREE.Vector3(-2.5, 0, -1), delay: 2.6, domId: 'city-navarrenx' },
+      { name: 'La Pierre St-M.', pos: new THREE.Vector3(-1.5, 0, 7.8), delay: 3.3, domId: 'city-lapierresm' },
+      { name: 'Arudy', pos: new THREE.Vector3(1.8, 0, 0.5), delay: 4.0, domId: 'city-arudy' },
+      { name: 'Mourenx', pos: new THREE.Vector3(1.5, 0, -3.0), delay: 4.7, domId: 'city-mourenx' },
+      { name: 'Orthez', pos: new THREE.Vector3(-1, 0, -4.5), delay: 5.4, domId: 'city-orthez' },
+      { name: 'Pau', pos: new THREE.Vector3(4, 0, -2), delay: 6.1, domId: 'city-pau' }
     ];
 
-    if (note) {
-      lines.push(`Detail : ${note}`);
-    }
-    return lines.join('\n');
-  }
+    const cityObjects = [];
+    const arcs = [];
+    const centerPos = cities[0].pos;
 
-  function updatePreview() {
-    if (!previewText) return;
-    if (slotDetailWrap) {
-      slotDetailWrap.classList.toggle('is-hidden', slotSelect.value !== 'Creneau precis');
-    }
-    previewText.textContent = buildMessage();
-  }
+    cities.forEach((city) => {
+      const geo = new THREE.SphereGeometry(city.isCenter ? 0.28 : 0.14, 16, 16);
+      const mat = new THREE.MeshBasicMaterial({
+        color: city.isCenter ? 0xF5A623 : 0x4e6a84,
+        transparent: !city.isCenter,
+        opacity: city.isCenter ? 1 : 0.55
+      });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.copy(city.pos);
+      mapGroup.add(mesh);
 
-  function clearError() {
-    if (!errorBox) return;
-    errorBox.textContent = '';
-    errorBox.classList.remove('is-visible');
-  }
-
-  function showError(msg, focusEl) {
-    if (errorBox) {
-      errorBox.textContent = msg;
-      errorBox.classList.add('is-visible');
-    }
-    if (focusEl && typeof focusEl.focus === 'function') {
-      focusEl.focus();
-    }
-  }
-
-  function validateForm() {
-    clearError();
-    if (!nameInput.value.trim()) {
-      showError('Merci d’indiquer votre prénom et nom afin que Fabien sache qui rappeler.', nameInput);
-      return false;
-    }
-    if (!phoneInput.value.trim() || phoneInput.value.replace(/\D/g, '').length < 10) {
-      showError('Merci d’indiquer un numéro de téléphone valide (10 chiffres) pour le rappel.', phoneInput);
-      return false;
-    }
-    if (!citySelect.value) {
-      showError('Merci de choisir la commune d’intervention dans la liste.', citySelect);
-      return false;
-    }
-    if (slotSelect.value === 'Creneau precis' && !slotDetailInput.value.trim()) {
-      showError('Merci de préciser la date ou le créneau souhaité.', slotDetailInput);
-      return false;
-    }
-    if (!addressInput.value.trim()) {
-      showError('Merci d’indiquer la rue et le numéro pour préparer l’intervention.', addressInput);
-      return false;
-    }
-    return true;
-  }
-
-  function showFeedback(text) {
-    if (!feedbackBox || !feedbackMessage) return;
-    feedbackMessage.textContent = text;
-    feedbackBox.classList.remove('is-hidden');
-  }
-
-  function saveState() {
-    if (!form) return;
-    try {
-      const payload = {
-        mode: getSelectedMode(),
-        name: nameInput.value,
-        phone: phoneInput.value,
-        city: citySelect.value,
-        slot: slotSelect.value,
-        slotDetail: slotDetailInput.value,
-        address: addressInput.value,
-        access: accessInput.value,
-        note: noteInput.value
-      };
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-    } catch (_e) {
-      // sessionStorage indisponible en navigation privée stricte
-    }
-  }
-
-  function restoreState() {
-    if (!form) return;
-    try {
-      const raw = sessionStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const data = JSON.parse(raw);
-      if (data.mode) {
-        const radio = form.querySelector(`input[name="mode"][value="${data.mode}"]`);
-        if (radio) radio.checked = true;
+      if (city.isCenter) {
+        const haloGeo = new THREE.SphereGeometry(0.42, 24, 24);
+        const haloMat = new THREE.MeshBasicMaterial({
+          color: 0xF5A623,
+          transparent: true,
+          opacity: 0.22,
+          blending: THREE.AdditiveBlending
+        });
+        mesh.add(new THREE.Mesh(haloGeo, haloMat));
       }
-      if (typeof data.name === 'string') nameInput.value = data.name;
-      if (typeof data.phone === 'string') phoneInput.value = data.phone;
-      if (typeof data.city === 'string') citySelect.value = data.city;
-      if (typeof data.slot === 'string') slotSelect.value = data.slot;
-      if (typeof data.slotDetail === 'string') slotDetailInput.value = data.slotDetail;
-      if (typeof data.address === 'string') addressInput.value = data.address;
-      if (typeof data.access === 'string') accessInput.value = data.access;
-      if (typeof data.note === 'string') noteInput.value = data.note;
-    } catch (_e) {
-      // Ignore un état corrompu
-    }
-  }
 
-  if (form) {
-    restoreState();
-    updatePreview();
+      const label = document.createElement('div');
+      label.className = 'city-label' + (city.isCenter ? ' center-city' : '');
+      label.textContent = city.name;
+      labelWrapper.appendChild(label);
 
-    form.addEventListener('input', () => {
-      clearError();
-      updatePreview();
-      saveState();
+      const domEl = document.getElementById(city.domId);
+      cityObjects.push({ data: city, mesh, label, domEl });
+
+      if (!city.isCenter) {
+        const mid = new THREE.Vector3(
+          (centerPos.x + city.pos.x) / 2,
+          centerPos.distanceTo(city.pos) * 0.38,
+          (centerPos.z + city.pos.z) / 2
+        );
+        const curve = new THREE.QuadraticBezierCurve3(centerPos, mid, city.pos);
+        const points = curve.getPoints(50);
+        const arcGeo = new THREE.BufferGeometry().setFromPoints(points);
+        arcGeo.setDrawRange(0, REDUCED_MOTION ? 50 : 0);
+        const arcMat = new THREE.LineBasicMaterial({
+          color: 0xF5A623,
+          transparent: true,
+          opacity: 0.8,
+          blending: THREE.AdditiveBlending
+        });
+        const line = new THREE.Line(arcGeo, arcMat);
+        mapGroup.add(line);
+        arcs.push({
+          line,
+          arcGeo,
+          targetCity: cityObjects[cityObjects.length - 1],
+          delay: city.delay,
+          progress: REDUCED_MOTION ? 1 : 0
+        });
+      }
     });
 
-    form.addEventListener('change', () => {
-      clearError();
-      updatePreview();
-      saveState();
-    });
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (!validateForm()) return;
-      const body = encodeURIComponent(buildMessage());
-      const separator = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? '&' : '?';
-      window.location.href = `sms:${PHONE_RAW}${separator}body=${body}`;
-      showFeedback(
-        'Votre application SMS a été ouverte. L’intervention est confirmée uniquement après réponse ou rappel de Fabien.'
-      );
-    });
-
-    if (btnCopy) {
-      btnCopy.addEventListener('click', async () => {
-        if (!validateForm()) return;
-        const text = buildMessage();
-        try {
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            await navigator.clipboard.writeText(text);
-            showFeedback(
-              'Demande copiée. Envoyez-la par SMS au 06 25 17 06 65 ou par email. Confirmation après rappel de Fabien.'
-            );
-          } else {
-            showFeedback('Copie manuelle : sélectionnez le texte dans l’aperçu ci-dessus et envoyez-le au 06 25 17 06 65.');
-          }
-        } catch (_e) {
-          showFeedback('Copie manuelle : sélectionnez le texte dans l’aperçu ci-dessus et envoyez-le au 06 25 17 06 65.');
-        }
+    function projectLabels() {
+      const halfW = wrapper.clientWidth / 2;
+      const halfH = wrapper.clientHeight / 2;
+      cityObjects.forEach((obj) => {
+        const worldPos = new THREE.Vector3();
+        obj.mesh.getWorldPosition(worldPos);
+        worldPos.project(camera);
+        obj.label.style.left = (worldPos.x * halfW + halfW) + 'px';
+        obj.label.style.top = (-worldPos.y * halfH + halfH) + 'px';
       });
     }
 
-    if (btnReset) {
-      btnReset.addEventListener('click', () => {
-        form.reset();
-        clearError();
-        if (feedbackBox) feedbackBox.classList.add('is-hidden');
-        try {
-          sessionStorage.removeItem(STORAGE_KEY);
-        } catch (_e) {
-          // ignore
+    if (REDUCED_MOTION) {
+      cityObjects.forEach((obj) => {
+        obj.label.classList.add('active');
+        if (!obj.data.isCenter) {
+          obj.mesh.material.color.setHex(0x58c7e8);
+          obj.mesh.material.opacity = 1;
         }
-        updatePreview();
-        nameInput.focus();
+      });
+      if (toggleBtn) toggleBtn.style.display = 'none';
+      renderer.render(scene, camera);
+      projectLabels();
+      return;
+    }
+
+    let isPaused = false;
+    let elapsed = 0;
+    let lastTs = 0;
+    const loopDuration = 9.0;
+
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        isPaused = !isPaused;
+        toggleBtn.setAttribute('aria-pressed', isPaused ? 'true' : 'false');
+        toggleBtn.textContent = isPaused ? 'Relancer le radar' : 'Mettre le radar en pause';
+        if (!isPaused) lastTs = performance.now();
       });
     }
+
+    function animate(ts) {
+      requestAnimationFrame(animate);
+      if (isPaused) return;
+      if (!lastTs) lastTs = ts;
+      const dt = Math.min((ts - lastTs) / 1000, 0.1);
+      lastTs = ts;
+      elapsed += dt;
+
+      const cycleTime = elapsed % loopDuration;
+      mapGroup.rotation.y = elapsed * 0.12;
+      mapGroup.rotation.x = Math.sin(elapsed * 0.5) * 0.05;
+      mapGroup.rotation.z = Math.cos(elapsed * 0.3) * 0.05;
+
+      const pulse = 1 + Math.sin(elapsed * 4) * 0.08;
+      cityObjects[0].mesh.scale.setScalar(pulse);
+
+      const isActivePhase = cycleTime < loopDuration - 0.4;
+      if (cityObjects[0].domEl) {
+        cityObjects[0].domEl.classList.toggle('active', isActivePhase);
+      }
+
+      arcs.forEach((arc) => {
+        if (isActivePhase && cycleTime > arc.delay) {
+          arc.progress = Math.min((cycleTime - arc.delay) * 2.2, 1.0);
+        } else {
+          arc.progress = 0;
+          arc.targetCity.mesh.material.color.setHex(0x4e6a84);
+          arc.targetCity.mesh.material.opacity = 0.55;
+          if (arc.targetCity.domEl) arc.targetCity.domEl.classList.remove('active');
+          arc.targetCity.label.classList.remove('active');
+        }
+
+        arc.arcGeo.setDrawRange(0, Math.round(arc.progress * 50));
+
+        if (arc.progress >= 1.0) {
+          arc.targetCity.mesh.material.color.setHex(0x58c7e8);
+          arc.targetCity.mesh.material.opacity = 1.0;
+          if (arc.targetCity.domEl) arc.targetCity.domEl.classList.add('active');
+          arc.targetCity.label.classList.add('active');
+        }
+      });
+
+      projectLabels();
+      renderer.render(scene, camera);
+    }
+
+    const mapObs = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          requestAnimationFrame(animate);
+          mapObs.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    mapObs.observe(wrapper);
+
+    window.addEventListener('resize', () => {
+      const nW = wrapper.clientWidth;
+      const nH = wrapper.clientHeight;
+      if (!nW || !nH) return;
+      renderer.setSize(nW, nH);
+      camera.aspect = nW / nH;
+      camera.updateProjectionMatrix();
+      projectLabels();
+    });
   }
 
-  // ─── 5. RETOUR EN HAUT ───
+  window.addEventListener('load', () => {
+    try {
+      initHoloMap();
+    } catch (err) {
+      console.error('Erreur radar 3D:', err);
+    }
+  });
+
+  // ─── 3. RETOUR EN HAUT ───
   const backToTop = document.getElementById('back-to-top');
   if (backToTop) {
     window.addEventListener(
