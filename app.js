@@ -7,8 +7,11 @@
 
   // ─── 1. APPARITIONS REJOUÉES AU SCROLL (DESCENTE & REMONTÉE) ───
   const revealEls = document.querySelectorAll('.reveal');
+  const serviceRows = Array.from(document.querySelectorAll('.service-row'));
+
   if (REDUCED_MOTION || !('IntersectionObserver' in window)) {
     revealEls.forEach((el) => el.classList.add('visible'));
+    serviceRows.forEach((row) => row.classList.add('is-shown'));
   } else {
     const revealObs = new IntersectionObserver(
       (entries) => {
@@ -23,13 +26,27 @@
       { threshold: 0.08 }
     );
     revealEls.forEach((el) => revealObs.observe(el));
+
+    // Services un par un, alternés gauche -> droite -> gauche -> droite
+    const serviceObs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-shown');
+          } else if (entry.boundingClientRect.top > window.innerHeight * 0.85) {
+            entry.target.classList.remove('is-shown');
+          }
+        });
+      },
+      { threshold: 0.25, rootMargin: '0px 0px -8% 0px' }
+    );
+    serviceRows.forEach((row) => serviceObs.observe(row));
   }
 
   // ─── 2. PROGRESSION DU COURANT AU SCROLL (HEADER + FIL PRESTATIONS + PARALLAXE) ───
   const railFill = document.getElementById('scroll-rail-fill');
   const wireWrap = document.getElementById('services-track-wrap');
   const wireFill = document.getElementById('services-wire-fill');
-  const serviceRows = Array.from(document.querySelectorAll('.service-row'));
   const heroProof = document.getElementById('hero-proof');
   const backToTop = document.getElementById('back-to-top');
   let scrollYOffset = 0;
