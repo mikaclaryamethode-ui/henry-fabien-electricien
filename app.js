@@ -248,7 +248,104 @@
     });
   }
 
+  // ─── 1B. RÉSEAU ÉLECTRIQUE DISCRET DANS LE HERO (THREE.JS) ───
+  function initHeroNetwork() {
+    const hero = document.getElementById('hero-section');
+    if (!hero || typeof THREE === 'undefined' || REDUCED_MOTION) return;
+
+    const canvas = document.createElement('canvas');
+    canvas.id = 'hero-particles';
+    canvas.style.position = 'absolute';
+    canvas.style.inset = '0';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.zIndex = '1';
+    canvas.style.pointerEvents = 'none';
+    hero.insertBefore(canvas, hero.firstChild);
+
+    const width = hero.clientWidth || window.innerWidth;
+    const height = hero.offsetHeight || 620;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(70, width / height, 0.1, 1000);
+    camera.position.z = 155;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const count = 65;
+    const positions = new Float32Array(count * 3);
+    const nodes = [];
+
+    for (let i = 0; i < count; i++) {
+      const x = (Math.random() - 0.5) * 380;
+      const y = (Math.random() - 0.5) * 240;
+      const z = (Math.random() - 0.5) * 90 - 40;
+      positions[i * 3] = x;
+      positions[i * 3 + 1] = y;
+      positions[i * 3 + 2] = z;
+      nodes.push({ baseX: x, baseY: y, baseZ: z, x, y, z });
+    }
+
+    const pGeo = new THREE.BufferGeometry();
+    pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const pMat = new THREE.PointsMaterial({ color: 0x4e6a84, size: 2.4, transparent: true, opacity: 0.6 });
+    const points = new THREE.Points(pGeo, pMat);
+    scene.add(points);
+
+    const lineMat = new THREE.LineBasicMaterial({ color: 0xF5A623, transparent: true, opacity: 0.14 });
+    const lines = new THREE.LineSegments(new THREE.BufferGeometry(), lineMat);
+    scene.add(lines);
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const t = performance.now() * 0.00045;
+      const posAttr = points.geometry.attributes.position.array;
+      const segs = [];
+
+      for (let i = 0; i < count; i++) {
+        const n = nodes[i];
+        n.x = n.baseX + Math.sin(t + i) * 9;
+        n.y = n.baseY + Math.cos(t + i * 1.3) * 9;
+        posAttr[i * 3] = n.x;
+        posAttr[i * 3 + 1] = n.y;
+        posAttr[i * 3 + 2] = n.z;
+
+        for (let j = i + 1; j < count; j++) {
+          const n2 = nodes[j];
+          const dx = n.x - n2.x;
+          const dy = n.y - n2.y;
+          const dz = n.z - n2.z;
+          if (dx * dx + dy * dy + dz * dz < 2800) {
+            segs.push(n.x, n.y, n.z, n2.x, n2.y, n2.z);
+          }
+        }
+      }
+
+      points.geometry.attributes.position.needsUpdate = true;
+      lines.geometry.setAttribute('position', new THREE.Float32BufferAttribute(segs, 3));
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    window.addEventListener('resize', () => {
+      const nw = hero.clientWidth;
+      const nh = hero.offsetHeight;
+      if (!nw || !nh) return;
+      renderer.setSize(nw, nh);
+      camera.aspect = nw / nh;
+      camera.updateProjectionMatrix();
+    });
+  }
+
   window.addEventListener('load', () => {
+    try {
+      initHeroNetwork();
+    } catch (err) {
+      console.error('Erreur réseau hero:', err);
+    }
     try {
       initHoloMap();
     } catch (err) {
