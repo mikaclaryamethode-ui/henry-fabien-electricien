@@ -25,7 +25,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
     integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ=="
     crossorigin="anonymous" defer></script>
-  <link rel="stylesheet" href="style.css?v=22" />
+  <link rel="stylesheet" href="style.css?v=23" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -63,7 +63,7 @@
 <body>
   <a class="skip-link" href="#contenu-principal">Aller au contenu principal</a>
 
-  <!-- NAVIGATION AVEC LE VRAI LOGO DE FABIEN -->
+  <!-- NAVIGATION AVEC LE VRAI LOGO DE FABIEN + RAIL DE PROGRESSION -->
   <header class="site-header" id="top">
     <div class="header-inner">
       <a href="#top" class="nav-logo" aria-label="Henry Fabien Électricien — accueil">
@@ -108,20 +108,25 @@
 
       <nav class="main-nav" aria-label="Navigation principale">
         <a href="#prestations">Prestations</a>
-        <a href="#zone">Zone d'intervention</a>
+        <a href="#zone">Zone 35 km</a>
+        <a href="#demande">Préparer un SMS</a>
         <a href="#contact">Contact</a>
       </nav>
 
       <a href="tel:+33625170665" class="nav-tel">06 25 17 06 65</a>
     </div>
+    <div class="scroll-rail" aria-hidden="true">
+      <div class="scroll-rail-fill" id="scroll-rail-fill"></div>
+    </div>
   </header>
 
   <main id="contenu-principal">
 
-    <!-- HERO SOBRE & VIVANT -->
+    <!-- HERO VIVANT (RÉSEAU ÉLECTRIQUE + PARALLAXE + COMPTEUR 25 ANS) -->
     <section class="hero" id="hero-section" aria-labelledby="hero-title">
       <div class="hero-grid-bg" aria-hidden="true"></div>
-      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="hero-glow" id="hero-glow" aria-hidden="true"></div>
+
       <div class="container hero-grid">
         <div class="hero-copy">
           <p class="hero-place">Électricien indépendant à Lanne-en-Barétous (64)</p>
@@ -132,12 +137,12 @@
           </p>
           <div class="hero-actions">
             <a href="tel:+33625170665" class="btn-primary">Appeler le 06 25 17 06 65</a>
-            <a href="#prestations" class="btn-outline">Voir les prestations</a>
+            <a href="#demande" class="btn-outline">Préparer un message</a>
           </div>
         </div>
 
-        <aside class="hero-proof" aria-label="Repères métier">
-          <div class="proof-number">25</div>
+        <aside class="hero-proof" id="hero-proof" aria-label="Repères métier">
+          <div class="proof-number" id="experience-counter">25</div>
           <div class="proof-caption">ans d'expérience</div>
           <dl class="proof-meta">
             <div>
@@ -157,7 +162,7 @@
       </div>
     </section>
 
-    <!-- PRESTATIONS EN RANGÉES ÉDITORIALES NETTES -->
+    <!-- PRESTATIONS AVEC LIGNE DE COURANT QUI SE TRACE AU SCROLL -->
     <section class="services-section" id="prestations" aria-labelledby="prestations-title">
       <div class="container">
         <div class="section-head reveal">
@@ -168,28 +173,53 @@
           </p>
         </div>
 
-        <ol class="service-list">
-          <li class="service-row reveal">
-            <h3>Dépannage</h3>
-            <p>Panne, disjoncteur qui saute, prise défectueuse ou circuit hors tension. Intervention rapide pour localiser le défaut et rétablir le courant proprement.</p>
-            <span class="service-scope">Urgence et recherche de panne</span>
-          </li>
-          <li class="service-row reveal">
-            <h3>Installation</h3>
-            <p>Tableaux électriques, prises de courant, interrupteurs, circuits dédiés et éclairages intérieurs ou extérieurs, en neuf comme en remplacement.</p>
-            <span class="service-scope">Neuf et remplacement</span>
-          </li>
-          <li class="service-row reveal">
-            <h3>Mise aux normes</h3>
-            <p>Conformité NF C 15-100 : protection différentielle 30 mA, mise à la terre, certificat Consuel et levée d'anomalies après diagnostic vente ou location.</p>
-            <span class="service-scope">NF C 15-100 et Consuel</span>
-          </li>
-          <li class="service-row reveal">
-            <h3>Rénovation</h3>
-            <p>Réfection complète de l'installation électrique d'une maison, d'un appartement, d'un gîte ou d'un local professionnel, avec repérage clair de chaque circuit.</p>
-            <span class="service-scope">Réfection complète</span>
-          </li>
-        </ol>
+        <div class="services-track-wrap" id="services-track-wrap">
+          <div class="services-wire" aria-hidden="true">
+            <div class="services-wire-fill" id="services-wire-fill"></div>
+          </div>
+
+          <ol class="service-list">
+            <li class="service-row reveal" data-preset="URGENCE">
+              <span class="wire-node" aria-hidden="true"></span>
+              <div class="service-title-col">
+                <h3>Dépannage</h3>
+                <span class="service-scope">Urgence et recherche de panne</span>
+              </div>
+              <p>Panne, disjoncteur qui saute, prise défectueuse ou circuit hors tension. Intervention rapide pour localiser le défaut et rétablir le courant proprement.</p>
+              <a href="#demande" class="service-link" data-set-mode="URGENCE">Signaler une panne</a>
+            </li>
+
+            <li class="service-row reveal" data-preset="DEVIS">
+              <span class="wire-node" aria-hidden="true"></span>
+              <div class="service-title-col">
+                <h3>Installation</h3>
+                <span class="service-scope">Neuf et remplacement</span>
+              </div>
+              <p>Tableaux électriques, prises de courant, interrupteurs, circuits dédiés et éclairages intérieurs ou extérieurs, en neuf comme en remplacement.</p>
+              <a href="#demande" class="service-link" data-set-mode="DEVIS">Demander un devis</a>
+            </li>
+
+            <li class="service-row reveal" data-preset="NORMES">
+              <span class="wire-node" aria-hidden="true"></span>
+              <div class="service-title-col">
+                <h3>Mise aux normes</h3>
+                <span class="service-scope">NF C 15-100 et Consuel</span>
+              </div>
+              <p>Conformité NF C 15-100 : protection différentielle 30 mA, mise à la terre, certificat Consuel et levée d'anomalies après diagnostic vente ou location.</p>
+              <a href="#demande" class="service-link" data-set-mode="NORMES">Planifier une conformité</a>
+            </li>
+
+            <li class="service-row reveal" data-preset="DEVIS">
+              <span class="wire-node" aria-hidden="true"></span>
+              <div class="service-title-col">
+                <h3>Rénovation</h3>
+                <span class="service-scope">Réfection complète</span>
+              </div>
+              <p>Réfection complète de l'installation électrique d'une maison, d'un appartement, d'un gîte ou d'un local professionnel, avec repérage clair de chaque circuit.</p>
+              <a href="#demande" class="service-link" data-set-mode="DEVIS">Parler de mon projet</a>
+            </li>
+          </ol>
+        </div>
       </div>
     </section>
 
@@ -204,17 +234,18 @@
           </p>
 
           <ul class="commune-grid" aria-label="Communes desservies">
-            <li id="city-lanne" class="is-center">Lanne-en-Barétous <span>Base</span></li>
-            <li id="city-mauleon">Mauléon-Licharre</li>
-            <li id="city-oloron">Oloron-Sainte-Marie</li>
-            <li id="city-arette">Arette</li>
-            <li id="city-navarrenx">Navarrenx</li>
-            <li id="city-lapierresm">La Pierre Saint-Martin</li>
-            <li id="city-arudy">Arudy</li>
-            <li id="city-mourenx">Mourenx</li>
-            <li id="city-orthez">Orthez</li>
-            <li id="city-pau">Pau</li>
+            <li><button type="button" id="city-lanne" class="commune-item is-center" data-city-name="Lanne-en-Baretous">Lanne-en-Barétous <span>Base</span></button></li>
+            <li><button type="button" id="city-mauleon" class="commune-item" data-city-name="Mauleon-Licharre">Mauléon-Licharre</button></li>
+            <li><button type="button" id="city-oloron" class="commune-item" data-city-name="Oloron-Sainte-Marie">Oloron-Sainte-Marie</button></li>
+            <li><button type="button" id="city-arette" class="commune-item" data-city-name="Arette">Arette</button></li>
+            <li><button type="button" id="city-navarrenx" class="commune-item" data-city-name="Navarrenx">Navarrenx</button></li>
+            <li><button type="button" id="city-lapierresm" class="commune-item" data-city-name="La Pierre Saint-Martin">La Pierre Saint-Martin</button></li>
+            <li><button type="button" id="city-arudy" class="commune-item" data-city-name="Arudy">Arudy</button></li>
+            <li><button type="button" id="city-mourenx" class="commune-item" data-city-name="Mourenx">Mourenx</button></li>
+            <li><button type="button" id="city-orthez" class="commune-item" data-city-name="Orthez">Orthez</button></li>
+            <li><button type="button" id="city-pau" class="commune-item" data-city-name="Pau">Pau</button></li>
           </ul>
+          <p class="zone-tip">Cliquez sur votre commune pour la pré-remplir dans votre message ci-dessous.</p>
         </div>
 
         <div class="zone-visual reveal">
@@ -231,19 +262,153 @@
       </div>
     </section>
 
+    <!-- PRÉ-MESSAGE CLIENT TERRAIN (SOMBRE & FLUIDE) -->
+    <section class="request-section" id="demande" aria-labelledby="demande-title">
+      <div class="container request-layout">
+        <div class="request-form-col reveal">
+          <h2 id="demande-title">Préparer un message pour Fabien</h2>
+          <p class="request-lead">
+            Je travaille seul sur chantier et ne peux pas toujours décrocher tout de suite.
+            Rédigez l'essentiel ici : le site prépare un SMS clair et complet, lisible en 2 secondes pour que je vous rappelle vite.
+          </p>
+
+          <form class="request-form" id="intervention-form" novalidate>
+            <fieldset class="mode-fieldset">
+              <legend>Nature de la demande</legend>
+              <div class="mode-choices">
+                <label class="mode-option">
+                  <input type="radio" name="mode" value="URGENCE" checked />
+                  <span>Dépannage</span>
+                </label>
+                <label class="mode-option">
+                  <input type="radio" name="mode" value="DEVIS" />
+                  <span>Devis / Rénovation</span>
+                </label>
+                <label class="mode-option">
+                  <input type="radio" name="mode" value="NORMES" />
+                  <span>Mise aux normes</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="form-row-2">
+              <div class="field">
+                <label for="client-name">Prénom et nom <span aria-hidden="true">*</span></label>
+                <input id="client-name" name="name" type="text" autocomplete="name" maxlength="80" required
+                  placeholder="Ex. Marie Dupont" />
+              </div>
+
+              <div class="field">
+                <label for="client-phone">Téléphone de rappel <span aria-hidden="true">*</span></label>
+                <input id="client-phone" name="phone" type="tel" autocomplete="tel" maxlength="20" required
+                  placeholder="Ex. 06 12 34 56 78" />
+              </div>
+            </div>
+
+            <div class="form-row-2">
+              <div class="field">
+                <label for="client-city">Commune <span aria-hidden="true">*</span></label>
+                <select id="client-city" name="city" required>
+                  <option value="">Choisir une commune</option>
+                  <option value="Lanne-en-Baretous">Lanne-en-Barétous</option>
+                  <option value="Arette">Arette</option>
+                  <option value="Aramits">Aramits</option>
+                  <option value="Oloron-Sainte-Marie">Oloron-Sainte-Marie</option>
+                  <option value="Mauleon-Licharre">Mauléon-Licharre</option>
+                  <option value="Navarrenx">Navarrenx</option>
+                  <option value="La Pierre Saint-Martin">La Pierre Saint-Martin</option>
+                  <option value="Arudy">Arudy</option>
+                  <option value="Mourenx">Mourenx</option>
+                  <option value="Orthez">Orthez</option>
+                  <option value="Pau">Pau</option>
+                  <option value="Autre commune (a confirmer)">Autre commune (à confirmer par téléphone)</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="client-slot">Créneau souhaité <span aria-hidden="true">*</span></label>
+                <select id="client-slot" name="slot" required>
+                  <option value="Des que possible">Dès que possible</option>
+                  <option value="Aujourd'hui">Aujourd'hui</option>
+                  <option value="Cette semaine">Cette semaine</option>
+                  <option value="Creneau precis">À une date précise</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field is-hidden" id="precise-slot-wrap">
+              <label for="client-slot-detail">Date ou créneau souhaité</label>
+              <input id="client-slot-detail" name="slotDetail" type="text" maxlength="80"
+                placeholder="Ex. Jeudi matin entre 9h et 12h" />
+            </div>
+
+            <div class="form-row-2">
+              <div class="field">
+                <label for="client-address">Adresse (rue et numéro) <span aria-hidden="true">*</span></label>
+                <input id="client-address" name="address" type="text" autocomplete="street-address" maxlength="120" required
+                  placeholder="Ex. 12 rue de la Vallée" />
+              </div>
+
+              <div class="field">
+                <label for="client-access">Complément d'accès</label>
+                <input id="client-access" name="access" type="text" maxlength="100"
+                  placeholder="Ex. Portail vert, interphone Dupont" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="client-note">Description rapide du besoin</label>
+              <textarea id="client-note" name="note" rows="3" maxlength="240"
+                placeholder="Ex. Coupure sur les prises de la cuisine depuis ce matin."></textarea>
+            </div>
+
+            <div class="form-error" id="form-error" role="alert" aria-live="assertive"></div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn-primary" id="btn-sms">Ouvrir le SMS pré-rempli</button>
+              <button type="button" class="btn-outline" id="btn-copy">Copier le message</button>
+            </div>
+
+            <div class="form-feedback is-hidden" id="form-feedback" role="status" aria-live="polite">
+              <p id="feedback-message"></p>
+              <button type="button" class="btn-reset" id="btn-reset">Nouvelle demande</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- APERÇU EN DIRECT DU SMS SUR LE CÔTÉ (STICKY AU SCROLL) -->
+        <aside class="sms-stage reveal" aria-label="Aperçu du message préparé">
+          <div class="sms-card">
+            <div class="sms-head">
+              <div>
+                <span class="sms-to">Destinataire</span>
+                <strong>Henry Fabien — 06 25 17 06 65</strong>
+              </div>
+              <span class="sms-state">Prêt à l'envoi</span>
+            </div>
+
+            <pre class="sms-bubble" id="preview-text">Complétez les champs pour voir apparaître votre SMS prêt à envoyer.</pre>
+
+            <p class="sms-device-hint" id="device-hint"></p>
+
+            <div class="sms-notes">
+              <p><strong>Confirmation directe :</strong> aucune intervention n'est planifiée sans rappel ou SMS de confirmation de Fabien.</p>
+              <p><strong>Danger immédiat :</strong> en cas de fumée, d'odeur de brûlé ou d'étincelle, ne touchez pas à l'installation, éloignez-vous et appelez les secours (18 ou 112).</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
     <!-- BANDEAU APPEL DIRECT -->
     <section class="cta-band" aria-labelledby="cta-title">
       <div class="container cta-inner">
         <div>
-          <h2 id="cta-title">Un problème électrique ?</h2>
-          <p>
-            Je travaille seul sur le terrain. Si je suis sur un chantier et que je ne décroche pas tout de suite,
-            laissez-moi un SMS avec votre prénom et votre commune : je vous rappelle rapidement.
-          </p>
+          <h2 id="cta-title">Besoin de parler directement ?</h2>
+          <p>Un appel suffit pour faire le point sur votre panne, votre tableau ou votre projet de rénovation.</p>
         </div>
         <div class="cta-actions">
           <a href="tel:+33625170665" class="btn-dark">Appeler le 06 25 17 06 65</a>
-          <a href="sms:+33625170665" class="btn-dark-outline">Envoyer un SMS</a>
         </div>
       </div>
     </section>
@@ -254,7 +419,7 @@
         <div class="contact-direct reveal">
           <h2 id="contact-title">Contact direct</h2>
           <p class="contact-intro">
-            Pas d'intermédiaire ni de plateforme : vous parlez directement à l'artisan qui se déplace chez vous.
+            Pas d'intermédiaire ni de plateforme : vous échangez directement avec l'artisan qui se déplace chez vous.
           </p>
           <div class="direct-lines">
             <div class="direct-line">
@@ -309,7 +474,7 @@
     </svg>
   </a>
 
-  <script src="app.js?v=22" defer></script>
+  <script src="app.js?v=23" defer></script>
 </body>
 
 </html>
