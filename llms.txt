@@ -1,0 +1,20 @@
+# Henry Fabien, électricien
+
+> Électricien indépendant basé au 66 rue Matachot, 64570 Lanne-en-Barétous (Pyrénées-Atlantiques). Plus de 25 ans d'expérience, dont 12 ans dans les Pyrénées-Atlantiques. Assuré en décennale et RC Pro. Travaux conformes à la norme NF C 15-100.
+
+## Prestations
+- Dépannage : urgence et recherche de panne (disjoncteur qui saute, prise défectueuse, circuit hors tension).
+- Installation : tableaux électriques, prises, interrupteurs, circuits dédiés, éclairages intérieurs et extérieurs, en neuf comme en remplacement.
+- Mise aux normes NF C 15-100 : protection différentielle 30 mA, mise à la terre, certificat Consuel, levée d'anomalies après diagnostic vente ou location.
+- Rénovation : réfection complète de l'installation d'une maison, d'un appartement, d'un gîte ou d'un local professionnel.
+
+Pour les particuliers, les maisons anciennes, les gîtes et les locaux professionnels.
+
+## Zone d'intervention (environ 35 km)
+Lanne-en-Barétous, Aramits, Arette, La Pierre Saint-Martin, Mauléon-Licharre (Soule), Oloron-Sainte-Marie, Navarrenx, Arudy, Mourenx, Orthez, Pau : piémont pyrénéen, vallée de Barétous, Soule et secteur oloronais.
+
+## Contact
+- Téléphone et SMS : 06 25 17 06 65 (il travaille seul sur chantier : un SMS clair permet d'être rappelé vite ; le site prépare ce SMS)
+- Site : https://henry-fabien-electricien.vercel.app/
+- Aucune intervention n'est planifiée sans rappel ou SMS de confirmation de Fabien.
+- Danger immédiat (fumée, odeur de brûlé, étincelle) : ne pas toucher à l'installation, s'éloigner et appeler le 18 ou le 112.
